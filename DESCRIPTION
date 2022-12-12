@@ -11,3 +11,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
 URL: https://github.com/JamesFB1/Gopher.Fit
 BugReports: https://github.com/JamesFB1/Gopher.Fit/issues
+Depends: 
+    R (>= 2.10)
+LazyData: true
