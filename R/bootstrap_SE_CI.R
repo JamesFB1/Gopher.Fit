@@ -1,4 +1,4 @@
-bootstrap <- function(my_data = tortoise){
+SE_CI <- function(my_data = tortoise){
 
   my_data <- my_data %>%
   rowid_to_column("ID") %>%  # add ID column
@@ -9,7 +9,7 @@ bootstrap <- function(my_data = tortoise){
   my_data <- my_data %>%
     mutate(.fitted = fit$beta[[2]] * prev)  # make a column for beta_1 * prev
 
-  ## Generate bootstrap samples: Resample Residuals
+  ## Generate bootstrap samples
   B = 1000
 
   bootstrap <- tibble(B = 1:B) %>%
@@ -29,7 +29,7 @@ bootstrap <- function(my_data = tortoise){
   ## Compute bootstrap standard errors and confidence intervals for beta_0, beta_1 and sigma_sqr
   Intercept <- bootstrap %>%
     filter(term == "(Intercept)") %>%  # filter for the Intercept term (beta_0)
-    summarize(SE = sd(estimate),  # estimate column has paramter estimate for Intercept term
+    summarize(SE = sd(estimate),  # estimate column has parameter estimate for Intercept term
               Lower95 = quantile(estimate, 0.025),
               Upper95 = quantile(estimate, 0.975))
 
