@@ -41,4 +41,21 @@ Hypothesis_Test <- function(my_data = tortoise){
   p_value <- p_value %>%
     summarize(p = mean(abs(values) > abs(t_value)))
 
+  # resample responses?
+  # bootstrap_Y <- tibble(B = 1:B) %>%
+  #   crossing(my_data) %>%
+  #   mutate(shells = sample(shells, n(), replace = TRUE)) %>%
+  #   nest_by(B) %>%
+  #   summarize(values = suppressMessages(run_model(data = data)), .groups = "drop")
+  #
+  # p_value_Y <- bootstrap_Y %>%
+  #   select(values) %>%
+  #   filter(row_number() %% 4 == 0) %>%
+  #   unnest(cols = values) %>%
+  #   filter(row_number() %% 4 == 2)
+  #
+  # p_value_Y <- p_value_Y %>%
+  #   summarize(p = mean(abs(values) > abs(t_value)))
+
+
 }
