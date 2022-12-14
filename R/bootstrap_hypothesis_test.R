@@ -1,11 +1,17 @@
-#' Title
+#' Final Project Hypothesis Test
 #'
 #' @param my_data the data set you're using
 #'
-#' @return
+#' @return the p-value obtained after testing then null hypothesis
 #' @export
 #'
 #' @examples
+#' # load tortoise data
+#' load("~/Gopher.Fit/data/tortoise.rda")
+#'
+#' # Compute p-value
+#' Hypothesis_Test()
+#'
 Hypothesis_Test <- function(my_data = tortoise){
 
   my_data <- my_data %>%
