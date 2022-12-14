@@ -19,3 +19,7 @@ Imports:
     lme4,
     tibble,
     tidyr
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
