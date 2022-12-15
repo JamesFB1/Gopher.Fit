@@ -1,5 +1,5 @@
 ---
-title: "Gopher_Fit_Vignette"
+title: "Gopher.Fit Vignette"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Gopher_Fit_Vignette}
@@ -14,6 +14,62 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(Gopher.Fit)
+```{r setup, echo = FALSE, message=FALSE}
+#library(Gopher.Fit)
+library(tidyverse)
+library(patchwork)
+load("~/Gopher.Fit/data/tortoise.rda")
+```
+## Exploratory Data Analysis
+
+The main goal of this package is to fit a Poisson GLMM to the Gopher Tortoise data set, and describe the relationship between increasing seroprevalance of upper respiratory tract infections in Gopher Tortoises on the number of shells found (i.e., the number of dead tortoises) after accounting for the area of each site. Before doing that it is important to analyze the data ourselves.\ 
+\ 
+
+The data set has 7 variables; Site, Year, Shells, Type, Area, Density, and Prev. The first row of the data is shown here:
+
+```{r, echo = FALSE}
+tortoise %>%
+  head(n = 1L) %>%
+  knitr::kable()
+```
+
+The response variable of our model is the Shells variable which measures the number of dead tortoises within each site. We want to study the relationship between this variable and both the Prev and Area variables. Before fitting the model we should explore this relationship further.\ 
+
+
+```{r, echo = FALSE, fig.width= 7, fig.height=4}
+tortoise$year = cut(tortoise$year, breaks = c(0,2004.5,2005.5,2007), labels = c("2004", "2005", "2006"))
+ggplot(data = tortoise, aes(x = Area, y = shells, color = Site, shape = year)) +
+  geom_point() +
+  theme(legend.position = "top")
+
+ggplot(data = tortoise, aes(x = prev, y = shells, color = Site, shape = year)) +
+  geom_point() +
+  theme(legend.position = "top")
+```
+  
+  
+These plots show the relationship between these variables. We can see that both variables have a slight positive correlation with Shells, but Prev has more influence on Shells. One particular site that is particularly telling is the "CF" site. We can see the first two year have low seroprevalence and there are 0 Shells, and then in 2006 when seroprevalence increases to around 45, shells increases to 3. There are a few outliers.  
+
+These outliers can be explained by this table, it shows that over 2003 there was an especially high level of Shells even with an average prevalence over the sites lower than the following years.
+
+```{r, echo = FALSE}
+shells_by_year = tortoise %>%
+  group_by(year) %>%
+  summarize("Total Shells" = sum(shells),
+            "Average Prevalence" = mean(prev))
+
+shells_by_year %>%
+  knitr::kable()
+```
+  
+  This next table shows total shells over all years per site, as well as the average prevalence across the years. It shows that the highest number of shells belongs to the sight with the highest average prevalence, and the lowest number of shells with the lowest average prevalence.
+```{r, echo = FALSE}
+shells_by_site = tortoise %>%
+  group_by(Site) %>%
+  summarize("Total Shells" = sum(shells),
+            "Average Prevalence" = round(mean(prev), digits = 3)) %>%
+  arrange(desc(`Total Shells`))
+
+shells_by_site %>%
+  knitr::kable()
 ```
