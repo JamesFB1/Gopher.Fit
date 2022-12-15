@@ -37,20 +37,38 @@ The response variable of our model is the Shells variable which measures the num
 
 
 ```{r, echo = FALSE, fig.width= 7, fig.height=4}
-tortoise$year = cut(tortoise$year, breaks = c(0,2004.5,2005.5,2007), labels = c("2004", "2005", "2006"))
+tortoise$year = cut(tortoise$year, 
+                    breaks = c(0, 2004.5, 2005.5, 2007), 
+                    labels = c("2004", "2005", "2006"))
+
+# colourblind friendly palette
+cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#550994", "#882255")
+
 ggplot(data = tortoise, aes(x = Area, y = shells, color = Site, shape = year)) +
   geom_point() +
-  theme(legend.position = "top")
+  theme_bw() + 
+  theme(legend.position = "top") + 
+  labs(title = "Area of Site vs. Number of Shells", 
+       x = "Area of Site", 
+       y = "Number of Shells") + 
+  guides(shape = guide_legend(title = "Year")) +
+  scale_color_manual(values = cbbPalette)
 
 ggplot(data = tortoise, aes(x = prev, y = shells, color = Site, shape = year)) +
   geom_point() +
-  theme(legend.position = "top")
+  theme_bw() + 
+  theme(legend.position = "top") + 
+  labs(title = "Seroprevalence vs. Number of Shells", 
+       x = "Seroprevalence", 
+       y = "Number of Shells") + 
+  guides(shape = guide_legend(title = "Year")) +
+  scale_color_manual(values = cbbPalette)
 ```
   
   
 These plots show the relationship between these variables. We can see that both variables have a slight positive correlation with Shells, but Prev has more influence on Shells. One particular site that is particularly telling is the "CF" site. We can see the first two year have low seroprevalence and there are 0 Shells, and then in 2006 when seroprevalence increases to around 45, shells increases to 3. There are a few outliers.  
 
-These outliers can be explained by this table, it shows that over 2003 there was an especially high level of Shells even with an average prevalence over the sites lower than the following years.
+These outliers can be explained by this table below. It shows that over 2003 there was an especially high level of Shells even with an average prevalence over the sites lower than the following years.
 
 ```{r, echo = FALSE}
 shells_by_year = tortoise %>%
@@ -62,7 +80,7 @@ shells_by_year %>%
   knitr::kable()
 ```
   
-  This next table shows total shells over all years per site, as well as the average prevalence across the years. It shows that the highest number of shells belongs to the sight with the highest average prevalence, and the lowest number of shells with the lowest average prevalence.
+  This next table shows total shells across all years by site, as well as the average prevalence across the years. It shows that the highest number of shells belongs to the site with the highest average prevalence, and the lowest number of shells with the lowest average prevalence.
 ```{r, echo = FALSE}
 shells_by_site = tortoise %>%
   group_by(Site) %>%
