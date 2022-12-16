@@ -1,6 +1,11 @@
 #' Final Project Hypothesis Test
 #'
 #' @param my_data the data set you're using
+#' @param exmaple the name of your example: will be one of either "culcita", "ctsib", "epilepsy", or "tortoise"
+#' @param fiited_values fitted values of your linear predictor under the null hypothesis without random effects
+#' @param m either the number of repeated observations from n individuals (repeated measures study)
+#' or the number of subjects within n groups (grouped effects data)
+#' @param response the response variable of your data set in ""
 #'
 #' @return the p-value obtained after testing then null hypothesis
 #' @export
@@ -12,7 +17,7 @@
 #' # Compute p-value
 #' Hypothesis_Test(my_data = tortoise)
 #'
-Hypothesis_Test <- function(my_data, example, fitted_values, m){
+Hypothesis_Test <- function(my_data, example, fitted_values, m, response){
 
   # Fit the model
   fit = run_model(my_data, example)
@@ -26,11 +31,19 @@ Hypothesis_Test <- function(my_data, example, fitted_values, m){
 
   bootstrap <- tibble(B = 1:B) %>%
     crossing(my_data) %>%
-    mutate(z = rep(rnorm(n()/3, mean = 0, sd = sqrt(fit$sigmasq)), each = m), # resample the random effects from N(0, sigmasq)
+    mutate(z = rep(rnorm(n()/m, mean = 0, sd = sqrt(fit$sigmasq)), each = m), # simulate the random effects from N(0, sigmasq)
            eta_new = eta_old + z,  # eta_ij* = beta_0 + log(xi2) + zi* (no beta_1 this time)
-           shells = rpois(n(), lambda = exp(eta))) %>%  # Yij*~Poisson(lambda) where lambda = mu_ij* = exp(eta_ij*)
+           response = rpois(n(), lambda = exp(eta)))  # Yij*~Poisson(lambda) where lambda = mu_ij* = exp(eta_ij*)
+
+  # delete orignal response column
+  bootstrap = select(bootstrap,-colnames(bootstrap)[which(names(bootstrap) == response)])
+
+  # rename new response column
+  colnames(bootstrap)[which(names(bootstrap) == "response")] <- response
+
+  bootstrap = bootstrap %>%
     nest_by(B) %>%
-    summarize(values = suppressMessages(run_model(data = data)), .groups = "drop")  # refit
+    summarize(values = suppressWarnings(suppressMessages(run_model(data = data, example = example))), .groups = "drop")
 
   # check convergence
   Convergence = bootstrap %>%
