@@ -10,7 +10,7 @@
 #' load("~/Gopher.Fit/data/tortoise.rda")
 #'
 #' # Compute p-value
-#' Hypothesis_Test()
+#' Hypothesis_Test(my_data = tortoise)
 #'
 Hypothesis_Test <- function(my_data = tortoise){
 
