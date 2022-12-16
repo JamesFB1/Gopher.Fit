@@ -27,7 +27,9 @@ Gopher.Fit is an R package that can be used to fit the Poisson Generalized Linea
 
 ## Introduction to the Poisson GLMM
 
-Like any model within the framework of GLMM
+Like any model within the framework of GLMM, the Poisson GLMM has 3 components to make note of. 
+1. The distribution of the response variable belongs to the exponential family. 
+2. The mean is 
 
 The Poisson distribution arises naturally in several ways:
 * For small success probabilities and large number of trials, Poisson is a good approximation for Binomial. 
