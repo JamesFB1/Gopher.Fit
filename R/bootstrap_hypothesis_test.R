@@ -14,9 +14,18 @@
 #' # load tortoise data
 #' load("~/Gopher.Fit/data/tortoise.rda")
 #'
-#' # Compute p-value
-#' Hypothesis_Test(my_data = tortoise)
+#' #Fit model to gopher tortoises data
+#' tortoise_fit <- run_model(data = tortoise, example = "tortoise")
 #'
+#' # Obtain the fitted values
+#' x1 <- tortoise$prev
+#' x2 <- tortoise$Area
+#'
+#' fitted_values <- tortoise_fit$beta[[1]] + tortoise_fit$beta[[2]] * x1 + log(x2) #fitted values without random effects
+#'
+#' # Compute p-value
+#' Hypothesis_Test(tortoise, "tortoise, fitted_values, 3, "shells")
+
 Hypothesis_Test <- function(my_data, example, fitted_values, m, response){
 
   # Fit the model
