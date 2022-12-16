@@ -110,10 +110,32 @@ tortoise_clean <- tortoise %>%
   
 ```{r}
 # Estimating Standard Errors and Confidence Intervals
-SE_CI(tortoise_clean)
+se_ci_estimates <- SE_CI(tortoise_clean)
 
 ```
 
-  Within the function, the first step that is completed is the the model is fit using the run_model function. 
+  Within the function, we first fit our model using the run_model function. For ease, we add the value of $\hat{\beta_1}x_{ij1}$ to the dataset.
+  
+  Next, we wish to generate 1000 bootstrap samples. The SE_CI function will resample the values of the 10 random effects for each of the 3 years to obtain 1000 bootstrap samples of size 30. Since we have the estimates of the fixed effects from our initial fit of the model, we can compute $\eta_{ij}^* = \beta_0 + \beta_1x_{ij1} + log(x_{i2}) + z_i^*$ for $i=1, ..., 10$ and $j = 1,2,3$. Since $\mu_{ij} = e^{\eta_{ij}}$, we can compute $\mu_{ij}^*$ and simulate new $Y_{ij}^* \sim \text{Poisson}(\mu_{ij}^*)$ for $Y_{ij}$, the number of shells found at each site. We then refit the model to obtain 1000 bootstrapped estimates of $\beta_0^*$, $\beta_1^*$, and $\sigma^2$. Finally, we compute the standard errors of each estimate, as well as the confidence intervals. 
+  
+  The table below summarizes the output obtained from the function after using the gopher tortoise dataset. 
+  
+  We also consider how we can use the bootstrap to perform hypothesis tests. We wish to test the null hypothesis that there is no effect of prevalence on the number of shells found at each site:
+
+$$
+H_0: \beta_1 = 0 \text{ versus } H_1: \beta_1 \neq 0
+$$
+  Since the p-value is the probability that we observe a value of the test statistic as extreme or more extreme than what we observed given that the null hypothesis is true, we need to simulate form the sampling distribution of $\beta_1$ given that the null hypothesis is true. To do this, we repeat the bootstrap process above but use the linear predictor under the null hypothesis, which is:
+  
+$$
+\eta_{ij} = \beta_0 + log(x_{i2}) + z_i
+$$
+
+  The function in this package Hypothesis_Test does this.
+
+
+
+
+
 
 
