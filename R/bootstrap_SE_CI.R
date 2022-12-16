@@ -45,19 +45,19 @@ SE_CI = function(my_data = tortoise){
   # extract bootstrapped estimates
   Intercept <- bootstrap %>%
     select(values) %>%
-    filter(row_number() %% 6 == 1) %>%  # run_model has a list of 4 outputs, 1 to take the beta values
+    filter(row_number() %% 6 == 1) %>%  # run_model has a list of 6 outputs, 1 to take the beta values
     unnest(cols = values) %>%
     filter(row_number() %% 4 == 1)  # 1 to take the estimate for the Intercept
 
   Prev <- bootstrap %>%
     select(values) %>%
-    filter(row_number() %% 6 == 1) %>%  # run_model has a list of 4 outputs, 1 to take the beta values
+    filter(row_number() %% 6 == 1) %>%  # run_model has a list of 6 outputs, 1 to take the beta values
     unnest(cols = values) %>%
     filter(row_number() %% 4 == 2)  # 2 to take the estimate for prev
 
   Sigmasq <- bootstrap %>%
     select(values) %>%
-    filter(row_number() %% 6 == 2) %>%  # run_model has a list of 4 outputs, 2 to take the sigmasq value
+    filter(row_number() %% 6 == 2) %>%  # run_model has a list of 6 outputs, 2 to take the sigmasq value
     unnest(cols = values)
 
   # compute standard errors and confidence intervals

@@ -47,7 +47,7 @@ Hypothesis_Test <- function(my_data = tortoise){
   # first extract bootstrapped test statistics
   p_value <- bootstrap %>%
     select(values) %>%
-    filter(row_number() %% 6 == 4) %>%  # run_model has a list of 4 outputs, 0 to take the test statistics
+    filter(row_number() %% 6 == 4) %>%  # run_model has a list of 6 outputs, 0 to take the test statistics
     unnest(cols = values) %>%
     filter(row_number() %% 4 == 2)  # 2 to take the test-stat for prev
 

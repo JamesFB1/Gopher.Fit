@@ -107,7 +107,7 @@ After fitting the model using the run_model function, we will now use the functi
 
 Below, we implement function using the gopher tortoises data. The function returns a list of 3 tibbles. The tibbles contain the standard error, and upper and lower confidence interval estimates for $\beta_0$, $\beta_1$, and $\sigma^2$.
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 # Estimating Standard Errors and Confidence Intervals
 se_ci_estimates <- SE_CI(tortoise_clean)
 
@@ -115,13 +115,13 @@ se_ci_estimates <- SE_CI(tortoise_clean)
 
 Within the function, we first fit our model using the run_model function. For ease, we add the value of $\hat{\beta_1}x_{ij1}$ to the dataset.
 
-Next, we wish to generate 1000 bootstrap samples. The SE_CI function will resample the values of the 10 random effects for each of the 3 years to obtain 1000 bootstrap samples of size 30. Since we have the estimates of the fixed effects from our initial fit of the model, we can compute $\eta_{ij}^* = \beta_0 + \beta_1x_{ij1} + log(x_{i2}) + z_i^*$ for $i=1, ..., 10$ and $j = 1,2,3$. Since $\mu_{ij} = e^{\eta_{ij}}$, we can compute $\mu_{ij}^*$ and simulate new $Y_{ij}^* \sim \text{Poisson}(\mu_{ij}^*)$ for $Y_{ij}$, the number of shells found at each site. We then refit the model to obtain 1000 bootstrapped estimates of $\beta_0^*$, $\beta_1^*$, and $\sigma^2$. Finally, we compute the standard errors of each estimate, as well as the confidence intervals.
+Next, we wish to generate 1000 bootstrap samples. The SE_CI function will resample the values of the 10 random effects for each of the 3 years to obtain 1000 bootstrap samples of size 30. Since we have the estimates of the fixed effects from our initial fit of the model, we can compute $\eta_{ij}^* = \beta_0 + \beta_1x_{ij1} + log(x_{i2}) + z_i^*$ for $i=1, ..., 10$ and $j = 1,2,3$. Since $\mu_{ij} = e^{\eta_{ij}}$, we can compute $\mu_{ij}^*$ and simulate new $Y_{ij}^* \sim \text{Poisson}(\mu_{ij}^*)$ for $Y_{ij}$, the number of shells found at each site. We then refit the model to obtain 1000 bootstrapped estimates of $\beta_0^*$, $\beta_1^*$, and $\sigma^2$. The function also checks the convergence each time the model is fitted in the bootstrap and removes the estimates from the bootstrap where the model did not converge. Finally, we compute the standard errors of each estimate, as well as the confidence intervals.
 
-The table below summarizes the output obtained from the function after using the gopher tortoise dataset.
+This function gives an output of a list of tibbles giving the standard error, lower bound of the confidence interval and upper bound of the confidence interval. Here is the output:
 
-```{r}
+```{r, echo = false}
 
-
+se_ci_estimates 
 
 ```
 
@@ -147,3 +147,50 @@ p_value
 ```
 
 The p-value computed is 0. A p-value won't be exactly 0 since it is the area under the t-distribution curve, so we can assume that the p-value obtained is very small. This makes sense since in the original fit of the model, the t-statistic obtained for the parameter estimate for the prevalence is close to 5, which is very large. Since we have a small p-value, we can reject the null hypothesis and say that the seroprevalence of upper respiratory tract infections in Gopher Tortoises does have an effect on the number of shells found after accounting for the area of each site.
+
+```{r, echo = FALSE, message=FALSE, warning = FALSE}
+my_data = tortoise_clean
+fit = run_model(my_data, example = "tortoise")
+
+  # extract test statistic for prevalence
+t_value <- fit$test_stat[[2]]
+
+  # generate bootstrap samples under null hypothesis
+B <- 1000
+
+bootstrap <- tibble(B = 1:B) %>%
+    crossing(my_data) %>%
+    mutate(z = rep(rnorm(n()/3, mean = 0, sd = sqrt(fit$sigmasq)), each = 3), # resample the random effects from N(0, sigmasq)
+           eta = fit$beta[[1]] + log(Area) + z,  # eta_ij* = beta_0 + log(xi2) + zi* (no beta_1 this time)
+           shells = rpois(n(), lambda = exp(eta))) %>%  # Yij*~Poisson(lambda) where lambda = mu_ij* = exp(eta_ij*)
+    nest_by(B) %>%
+    summarize(values = suppressMessages(run_model(data = data)), .groups = "drop")  # refit
+
+  # check convergence
+Convergence = bootstrap %>%
+    filter(row_number() %% 6 == 5) %>%
+    unnest(cols = values) %>%
+    filter(values == -1) %>%
+    select(B)
+
+  # delete rows with unconverged estimates
+bootstrap = bootstrap %>%
+    rows_delete(Convergence)
+
+  # Compute p-value
+
+  # first extract bootstrapped test statistics
+p_value <- bootstrap %>%
+    select(values) %>%
+    filter(row_number() %% 6 == 4) %>%  # run_model has a list of 6 outputs, 0 to take the test statistics
+    unnest(cols = values) %>%
+    filter(row_number() %% 4 == 2)  # 2 to take the test-stat for prev
+  
+my_plot = ggplot(data = p_value, aes( x = values)) + 
+         geom_density() +
+         geom_vline(xintercept = t_value, col = "red") + 
+         ylab("Bootstrap Sampling Distribution (Null)") + 
+         xlab("Slope")
+
+my_plot
+```
