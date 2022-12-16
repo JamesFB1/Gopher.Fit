@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, echo = FALSE, message=FALSE}
-#library(Gopher.Fit)
+library(Gopher.Fit)
 library(tidyverse)
 library(patchwork)
 load("~/Gopher.Fit/data/tortoise.rda")
