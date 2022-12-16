@@ -6,6 +6,8 @@
 #' @param m either the number of repeated observations from n individuals (repeated measures study)
 #' or the number of subjects within n groups (grouped effects data)
 #' @param response the response variable of your data set in ""
+#' @param beta_1 the parameter of interest for which we wish to test the null hypothesis for
+#'
 #'
 #' @return the p-value obtained after testing then null hypothesis
 #' @export
@@ -24,12 +26,15 @@
 #' fitted_values <- tortoise_fit$beta[[1]] + tortoise_fit$beta[[2]] * x1 + log(x2) #fitted values without random effects
 #'
 #' # Compute p-value
-#' Hypothesis_Test(tortoise, "tortoise, fitted_values, 3, "shells")
+#' Hypothesis_Test(tortoise, "tortoise, fitted_values, 3, "shells", "prev")
 
-Hypothesis_Test <- function(my_data, example, fitted_values, m, response){
+Hypothesis_Test <- function(my_data, example, fitted_values, m, response, beta_1){
 
   # Fit the model
   fit = run_model(my_data, example)
+
+  # Get t-value for parameter of interest (beta_1)
+  t_value <- fit$test_stat[[beta_1]]
 
   # Add fitted values to original data
   my_data <- my_data %>%
