@@ -1,8 +1,8 @@
 #' Final Project SE and CI
 #'
 #' @param my_data the data set you're using
-#' @param exmaple the name of your example: will be one of either "culcita", "ctsib", "epilepsy", or "tortoise"
-#' @param fiited_values fitted values of your linear predictor without random effects
+#' @param example the name of your example: will be one of either "culcita", "ctsib", "epilepsy", or "tortoise"
+#' @param fitted_values fitted values of your linear predictor without random effects
 #' @param m either the number of repeated observations from n individuals (repeated measures study)
 #' or the number of subjects within n groups (grouped effects data)
 #' @param response the response variable of your data set in ""
@@ -34,12 +34,13 @@ SE_CI = function(my_data, example, fitted_values, m, response){
            eta_new = eta_old + z,  # eta_ij* = beta_0 + beta_1xij1 + log(xi2) + zi*
            response = rpois(n(), lambda = exp(eta_new))) # Yij*~Poisson(lambda) where lambda = mu_ij* = exp(eta_ij*)
 
-  # delete orignal response column
-  bootstrap = select(bootstrap,-colnames(bootstrap)[which(names(bootstrap) == response)])
+  # delete original response column
+  bootstrap = select(bootstrap, -colnames(bootstrap)[which(names(bootstrap) == response)])
 
   # rename new response column
   colnames(bootstrap)[which(names(bootstrap) == "response")] <- response
 
+  # Refit the model to obtain bootstrapped estimates
   bootstrap = bootstrap %>%
     nest_by(B) %>%
     summarize(values = suppressWarnings(suppressMessages(run_model(data = data, example = example))), .groups = "drop")
