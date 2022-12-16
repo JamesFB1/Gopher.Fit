@@ -131,8 +131,18 @@ $$
 \eta_{ij} = \beta_0 + log(x_{i2}) + z_i
 $$
 
-  The function in this package Hypothesis_Test does this.
+  The function titled Hypothesis_Test within this package  computes and returns the p-value after bootstrapping. The model is fit using the run_model function and a t-value for $\hat{\beta_1}$, the coefficient estimate for the seroprevalence paramter, is obtained. The function then  generates bootrapped samples for the random effects, and computes the value of $\eta_{ij}$ as seen above, allowing for the value of $\mu_{ij}$ to be obtained as well. The values of $Y_{ij}$ are then computed and the model is refit. The function then finds the bootstrapped test statistic values and computes the p-value, which is then returned. 
+  
+  Below, we implement the Hypothesis_Test function using the tortoise data.
+  
+```{r}
 
+p_value <- Hypothesis_Test(tortoise_clean)
+
+```
+
+
+  The p-value computed is 0. 
 
 
 
