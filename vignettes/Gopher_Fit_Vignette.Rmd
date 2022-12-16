@@ -21,6 +21,15 @@ library(patchwork)
 load("~/Gopher.Fit/data/tortoise.rda")
 ```
 
+
+## Gopher.Fit
+This is an R package that can be used to fit the Poisson GLMM. It implements bootstrapping to compute standard errors and confidence intervals, as well as hypothesis testing.
+
+## Introduction to the Poisson GLMM
+
+
+
+
 ## Exploratory Data Analysis
 
 The main goal of this package is to fit a Poisson GLMM to the Gopher Tortoise data set, and describe the relationship between increasing seroprevalance of upper respiratory tract infections in Gopher Tortoises on the number of shells found (i.e., the number of dead tortoises) after accounting for the area of each site. Before doing that it is important to analyze the data ourselves.   
@@ -96,10 +105,23 @@ shells_by_site %>%
 Before fitting the model, we clean up the dataset by adding an ID column and removing the type and density columns as we are not interested in these variables.
 
 ```{r}
-tortoise_clean <- tortoise %>%
+tortoise <- tortoise %>%
     rowid_to_column("ID") %>%  # add ID column
     select(-type, -density)    # delete type and density columns
 ```
+
+
+## Fit Model
+The run_model function in this package is used to fit the tortoise data to a poisson glmm. The first parameter needed for this function is the data, and the second paramter is the name of the dataset used. 
+
+```{r}
+# Fit model to gopher tortoises data
+tortoise_fit <- run_model(data = tortoise, example = "tortoise")
+```
+
+
+
+
 
 ## Bootstrap
 
