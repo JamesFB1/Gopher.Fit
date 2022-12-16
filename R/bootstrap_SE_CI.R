@@ -21,7 +21,7 @@ SE_CI = function(my_data, example, fitted_values, m){
 
   # Add fitted values to original data
   my_data <- my_data %>%
-    mutate(eta_old = fitted_values)
+    mutate(eta_old = fitted_values)  # fitted values without the random effects
 
   # generate bootstrap samples
   B = 1050  # generate 1050 bootstrap samples since model may not converge

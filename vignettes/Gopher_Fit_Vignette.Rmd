@@ -126,7 +126,7 @@ tortoise <- tortoise %>%
 
 
 ## Fit Model
-The run_model function in this package is used to fit the tortoise data to a poisson glmm. The first parameter needed for this function is the data, and the second paramter is the name of the dataset used. 
+The run_model function in this package is used to fit the tortoise data to a poisson glmm. The first parameter needed for this function is the data, and the second paramter is the name of the dataset used. The function also takes the fitted values, $\hat{\eta_{ij}}$ obtained from running the model (these values don't include the random effects). After sampling the random effects within the bootstrap function, we are able to set $\eta_{ij}^* = \beta_0 + \beta_1x_{ij1} + log(x_{i2}) + z_i^*$ and refit the model to obtain bootstrapped estimates of $\beta_0$ and $\beta_1$. This is discussed in more detail below. 
 
 ```{r}
 # Fit model to gopher tortoises data
@@ -136,7 +136,8 @@ tortoise_fit <- run_model(data = tortoise, example = "tortoise")
 x1 <- tortoise$prev
 x2 <- tortoise$Area
 
-fitted_values <- tortoise_fit$beta[[1]] + tortoise_fit$beta[[2]] * x1 + log(x2)
+fitted_values <- tortoise_fit$beta[[1]] + tortoise_fit$beta[[2]] * x1 + log(x2) 
+# fitted values without random effects
 
 ```
 
