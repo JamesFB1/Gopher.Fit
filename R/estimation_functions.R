@@ -102,17 +102,27 @@ run_model <- function(data, example = "tortoise"){
   ## Extract random effects variance
   sigmasq <- lmer_summ$varcor[[1]][[1]]
 
-  ## Adjust sigmasq
-  if(sigmasq == 0){
-    sigmasq <- .100
+  ## Extract optimization information
+  optinfo <- attributes(lmer_fit)$optinfo
 
-    set.seed(7777)
-    re <- rnorm(length(re), sd = sqrt(sigmasq))
+  ## Avoid estimate of sigmasq=0 for the original tortoise data only
+  if(example == "tortoise" & all(sort(data$shells) == c(0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,2,2,2,2,2,2,3,4,5,8,10,11,12))){
+    if(sigmasq == 0){
+      sigmasq <- .100
+
+      set.seed(7777)
+      re <- rnorm(length(re), sd = sqrt(sigmasq))
+    }
   }
 
   ## Return values
   list(beta = coeff,
        sigmasq = sigmasq,
        re = re,
-       test_stat = test_stat)
+       test_stat = test_stat,
+       convergence = c(optinfo$conv$opt,
+                       optinfo$conv$lme4$code),
+       messages = c(optinfo$message,
+                    optinfo$conv$lme4$messages))
+
 }
