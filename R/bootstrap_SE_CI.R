@@ -21,7 +21,7 @@ SE_CI = function(my_data = tortoise){
     mutate(.fitted = fit$beta[[2]] * prev)
 
   # generate bootstrap samples
-  B = 1000
+  B = 1050  # generate 1050 bootstrap samples - model may not converge
 
   bootstrap <- tibble(B = 1:B) %>%
     crossing(my_data) %>%
@@ -32,15 +32,16 @@ SE_CI = function(my_data = tortoise){
     summarize(values = suppressMessages(run_model(data = data)), .groups = "drop")
 
   # check convergence
-  Convergence = bootstrap %>%
+  Convergence <- bootstrap %>%
     filter(row_number() %% 6 == 5) %>%  # run_model has a list of 6 outputs, 5 to take the convergence
     unnest(cols = values) %>%
-    filter(values == -1) %>%
-    select(B)
+    filter(values == -1) %>%  # -1 - algorithm did not converge
+    select(B)  # the bootstrap run numbers where convergence didn't occur
 
-  # delete rows with unconverged estimates
-  bootstrap = bootstrap %>%
-    rows_delete(Convergence)
+  # delete rows with unconverged estimates and select the first 1000 bootstrapped samples
+  bootstrap <- bootstrap %>%
+    rows_delete(Convergence) %>%
+    slice(1:6000)  # to take the first 1000 bootstraps
 
   # extract bootstrapped estimates
   Intercept <- bootstrap %>%

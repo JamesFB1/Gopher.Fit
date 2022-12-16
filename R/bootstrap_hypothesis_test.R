@@ -21,7 +21,7 @@ Hypothesis_Test <- function(my_data = tortoise){
   t_value <- fit$test_stat[[2]]
 
   # generate bootstrap samples under null hypothesis
-  B <- 1000
+  B = 1050  # generate 1050 bootstrap samples - model may not converge
 
   bootstrap <- tibble(B = 1:B) %>%
     crossing(my_data) %>%
@@ -35,12 +35,13 @@ Hypothesis_Test <- function(my_data = tortoise){
   Convergence = bootstrap %>%
     filter(row_number() %% 6 == 5) %>%  # run_model has a list of 6 outputs, 5 to take the convergence
     unnest(cols = values) %>%
-    filter(values == -1) %>%
-    select(B)
+    filter(values == -1) %>%  # -1 - algorithm did not converge
+    select(B)  # the bootstrap run numbers where convergence didn't occur
 
-  # delete rows with unconverged estimates
+  # delete rows with unconverged estimates and select the first 1000 bootstrapped samples
   bootstrap = bootstrap %>%
-    rows_delete(Convergence)
+    rows_delete(Convergence) %>%
+    slice(1:6000)  # to take the first 1000 bootstraps
 
   # Compute p-value
 
