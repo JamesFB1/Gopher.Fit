@@ -69,7 +69,7 @@ Since there is no closed-form formula for $\hat{\beta}$ that can be obtained fro
 This package consists of three functions - run_model, SE_CI, and Hypothesis_Test. The function run_model will fit the Poisson GLMM and return an output of a list of summary statistics that include the estimates for the $\beta$ coefficients, the value of $\sigma^2$, the estimates for the random effects, the test statistics for each of the parameters, whether or not the model converged or not and associated warning messages. The SE_CI function uses bootstrapping to compute estimates for the standard error and confidence intervals for the $\beta$ coefficients and $\sigma^2$. The Hypothesis_Test function uses bootstrapping to test the hypothesis that there is no significant effect of the predictors of interest on the response. 
 
 
-## Example
+## Gopher Tortoises
 
 To illustrate the use of the functions in this package, we will analyze sample data that comes from a study of upper respiratory tract infections on the survival of wild gopher tortoises. Using the functions in this package, we will fit a Poisson GLMM to the Gopher Tortoise data set, and describe the relationship between increasing seroprevalance of upper respiratory tract infections in Gopher Tortoises on the number of shells found (i.e., the number of dead tortoises) after accounting for the area of each site. Before doing that it is important to analyze the data ourselves.   
 
@@ -211,11 +211,13 @@ se_ci_estimates <- SE_CI(my_data = tortoise, example = "tortoise",
                          fitted_values = fitted_values, m = 3, response = "shells")
 ```
 
+Here is a brief description of what the SE_CI function is doing:
+
 Within the function, we first fit our model using the run_model function. For ease, we add the value of $\hat{\beta_1}x_{ij1}$ to the dataset.
 
 Next, we wish to generate 1000 bootstrap samples. The SE_CI function will resample the values of the 10 random effects for each of the 3 years to obtain 1000 bootstrap samples of size 30. Since we have the estimates of the fixed effects from our initial fit of the model, we can compute $\eta_{ij}^* = \beta_0 + \beta_1x_{ij1} + log(x_{i2}) + z_i^*$ for $i=1, ..., 10$ and $j = 1,2,3$. Since $\mu_{ij} = e^{\eta_{ij}}$, we can compute $\mu_{ij}^*$ and simulate new $Y_{ij}^* \sim \text{Poisson}(\mu_{ij}^*)$ for $Y_{ij}$, the number of shells found at each site. We then refit the model to obtain 1000 bootstrapped estimates of $\beta_0^*$, $\beta_1^*$, and $\sigma^2$. The function also checks the convergence each time the model is fitted in the bootstrap and removes the estimates from the bootstrap where the model did not converge. Finally, we compute the standard errors of each estimate, as well as the confidence intervals.
 
-This function gives an output of a list of tibbles giving the standard error, lower bound of the confidence interval and upper bound of the confidence interval. Here is the output:
+The SE_CI function returns an output of a list of tibbles giving the standard error, lower bound of the confidence interval and upper bound of the confidence interval. Here is the output after running the function on the Gopher Tortoises data:
 
 ```{r, echo = false}
 
@@ -223,23 +225,26 @@ se_ci_estimates
 
 ```
 
-We also consider how we can use the bootstrap to perform hypothesis tests. We wish to test the null hypothesis that there is no effect of prevalence on the number of shells found at each site:
+We are also interested in performing a significance of regression test using the t-test. Bootstrapping may also be implemented to carry out this test. For our example, we wish to test the null hypothesis that there is no effect of prevalence on the number of shells found at each site:
 
 $$
 H_0: \beta_1 = 0 \text{ versus } H_1: \beta_1 \neq 0
-$$ Since the p-value is the probability that we observe a value of the test statistic as extreme or more extreme than what we observed given that the null hypothesis is true, we need to simulate form the sampling distribution of $\beta_1$ given that the null hypothesis is true. To do this, we repeat the bootstrap process above but use the linear predictor under the null hypothesis, which is:
+$$ 
+
+Since the p-value is the probability that we observe a value of the test statistic as extreme or more extreme than what we observed given that the null hypothesis is true, we need to simulate form the sampling distribution of $\beta_1$ given that the null hypothesis is true. To do this, we repeat the bootstrap process above but use the linear predictor under the null hypothesis, which is:
 
 $$
 \eta_{ij} = \beta_0 + log(x_{i2}) + z_i
 $$
 
-The function titled Hypothesis_Test within this package computes and returns the p-value after bootstrapping. The model is fit using the run_model function and a t-value for $\hat{\beta_1}$, the coefficient estimate for the seroprevalence parameter, is obtained. The function then generates bootstrapped samples for the random effects, and computes the value of $\eta_{ij}$ as seen above, allowing for the value of $\mu_{ij}$ to be obtained as well. The values of $Y_{ij}$ are then computed and the model is refit. The function then finds the bootstrapped test statistic values and computes the p-value, which is then returned.
+The function Hypothesis_Test within this package computes and returns the p-value after bootstrapping. The model is fit using the run_model function and a t-value for $\hat{\beta_1}$, the coefficient estimate for the seroprevalence parameter, is obtained. The function then generates bootstrapped samples for the random effects, and computes the value of $\eta_{ij}$ as seen above, allowing for the value of $\mu_{ij}$ to be obtained as well. The values of $Y_{ij}$ are then computed and the model is refit. The function then finds the bootstrapped test statistic values and computes the p-value, which is then returned.
 
-Below, we implement the Hypothesis_Test function using the tortoise data.
+Below, we implement the Hypothesis_Test function using the tortoise data. The arguments this function requires are similar to those of the SE_CI function used earlier.
 
 ```{r}
 
-p_value <- Hypothesis_Test(tortoise)
+p_value <- Hypothesis_Test(my_data = tortoise, example = "tortoise", 
+                           fitted_values = fitted_values, m = 3, response = "shells")
 p_value
 
 ```
