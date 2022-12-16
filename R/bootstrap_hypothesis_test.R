@@ -14,10 +14,6 @@
 #'
 Hypothesis_Test <- function(my_data = tortoise){
 
-  my_data <- my_data %>%
-    rowid_to_column("ID") %>%  # add ID column
-    select(-type, -density)    # delete type and density columns
-
   # fit the model
   fit = run_model(my_data, example = "tortoise")
 
