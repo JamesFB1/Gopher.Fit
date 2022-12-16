@@ -54,7 +54,7 @@ $$
 
 where $\beta_0$ represents the intercept, and $\beta = (\beta_1, ..., \beta_p)^T$ represents the vector of coefficients of the fixed effects. Furthermore, the responses are assumed to be independent given $\mu_i$ and the random effects are assumed to be independent and identically distributed normal random variables with mean 0 and variance $\sigma_2$ ($(Z_i \stackrel{iid}{\sim} N(0, \sigma^2)$). 
 
-Since we can't model the rate directly, we model a function of the rate by using the following, which is called the log link function (the log function linking the expected value of $Y_i$ with the linear function of our predictors:
+Since we can't model the rate directly, we model a function of the rate by using the following, which is called the log link function (the log function linking the expected value of $Y_i$ with the linear function of our predictors):
 
 $$
 \eta_i = log(\mu_i)
@@ -64,9 +64,9 @@ or
 $$
 \mu_i = exp(\eta_i)
 $$
+Since there is no closed-form formula for $\hat{\beta}$ that can be obtained from the log-liklihood, numerical methods need to be used to solve for $\hat{\beta}$.
 
-
-This package consists of three functions - run_model, SE_CI, and Hypothesis_Test. The function run_model will fit the Poisson GLMM and return an output of a list of summary statistics that include the estimates for the $\beta$ coefficients, the value of $\sigma^2$, the estimates for the random effects, the test statistics for each of the parameters, whether or not the model converged or not and various warning messages. The SE_CI function uses bootstrapping to compute estimates for the standard error and confidence intervals for the $\beta$ coefficients and $\sigma^2$. The Hypothesis_Test function uses bootstrapping to test the hypothesis that there is no significant effect of the predictors of interest on the response. 
+This package consists of three functions - run_model, SE_CI, and Hypothesis_Test. The function run_model will fit the Poisson GLMM and return an output of a list of summary statistics that include the estimates for the $\beta$ coefficients, the value of $\sigma^2$, the estimates for the random effects, the test statistics for each of the parameters, whether or not the model converged or not and associated warning messages. The SE_CI function uses bootstrapping to compute estimates for the standard error and confidence intervals for the $\beta$ coefficients and $\sigma^2$. The Hypothesis_Test function uses bootstrapping to test the hypothesis that there is no significant effect of the predictors of interest on the response. 
 
 
 ## Example
@@ -153,6 +153,7 @@ tortoise <- tortoise %>%
 
 
 ## Fit Model
+
 The run_model function in this package is used to fit the tortoise data to a poisson glmm. The first parameter needed for this function is the data, and the second paramter is the name of the dataset used. The function also takes the fitted values, $\hat{\eta_{ij}}$ obtained from running the model (these values don't include the random effects). After sampling the random effects within the bootstrap function, we are able to set $\eta_{ij}^* = \beta_0 + \beta_1x_{ij1} + log(x_{i2}) + z_i^*$ and refit the model to obtain bootstrapped estimates of $\beta_0$ and $\beta_1$. This is discussed in more detail below. 
 
 ```{r}
@@ -168,7 +169,31 @@ fitted_values <- tortoise_fit$beta[[1]] + tortoise_fit$beta[[2]] * x1 + log(x2)
 
 ```
 
+We can investigate the summary output returned from this function:
 
+```{r}
+
+## Components
+
+# 1) Estimated beta parameters
+tortoise_fit$beta
+
+# 2) Test statistics for each of the beta parameters
+tortoise_fit$test_stat
+
+# 3) Estimated variance parameter
+tortoise_fit$sigmasq
+
+# 4) Estimated random effects
+tortoise_fit$re
+
+# 5) Convergence check
+tortoise_fit$convergence
+
+# 6) Associated Messages
+tortoise_fit$messages
+
+```
 
 
 
@@ -176,12 +201,14 @@ fitted_values <- tortoise_fit$beta[[1]] + tortoise_fit$beta[[2]] * x1 + log(x2)
 
 After fitting the model using the run_model function, we will now use the function SE_CI from this package to find the standard errors and confidence intervals. This function implements a parametric bootstrap by simulating the random effects from $N(0, \sigma^2)$, since the random effects are assumed to be independent and identically distributed normal random variables with mean 0 and variance $\sigma^2$ $(Z_i \stackrel{iid}{\sim} N(0, \sigma^2)$.
 
-Below, we implement function using the gopher tortoises data. The function returns a list of 3 tibbles. The tibbles contain the standard error, and upper and lower confidence interval estimates for $\beta_0$, $\beta_1$, and $\sigma^2$.
+Below, we implement the SE_CI function using the gopher tortoises data. The function returns a list of 3 tibbles. The tibbles contain the standard error, and upper and lower confidence interval estimates for $\beta_0$, $\beta_1$, and $\sigma^2$.
+
+To run the function, we specify the dataset we are using, the name of the example (in our case, this will be "tortoise"), the fitted_values we computed earlier (keeping in mind that they do not include the random effects), the number of repeated observations (in our case, the m = 3 years are considered as repeated measures), and finally, the name of the response variable of interest as found in our data as a string (we use "shells").
 
 ```{r, warning=FALSE, message=FALSE}
 # Estimating Standard Errors and Confidence Intervals
-se_ci_estimates <- SE_CI(tortoise)
-
+se_ci_estimates <- SE_CI(my_data = tortoise, example = "tortoise", 
+                         fitted_values = fitted_values, m = 3, response = "shells")
 ```
 
 Within the function, we first fit our model using the run_model function. For ease, we add the value of $\hat{\beta_1}x_{ij1}$ to the dataset.
