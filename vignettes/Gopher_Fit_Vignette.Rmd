@@ -120,6 +120,13 @@ se_ci_estimates <- SE_CI(tortoise_clean)
   
   The table below summarizes the output obtained from the function after using the gopher tortoise dataset. 
   
+```{r}
+
+
+
+```
+
+  
   We also consider how we can use the bootstrap to perform hypothesis tests. We wish to test the null hypothesis that there is no effect of prevalence on the number of shells found at each site:
 
 $$
@@ -131,16 +138,16 @@ $$
 \eta_{ij} = \beta_0 + log(x_{i2}) + z_i
 $$
 
-  The function titled Hypothesis_Test within this package  computes and returns the p-value after bootstrapping. The model is fit using the run_model function and a t-value for $\hat{\beta_1}$, the coefficient estimate for the seroprevalence paramter, is obtained. The function then  generates bootrapped samples for the random effects, and computes the value of $\eta_{ij}$ as seen above, allowing for the value of $\mu_{ij}$ to be obtained as well. The values of $Y_{ij}$ are then computed and the model is refit. The function then finds the bootstrapped test statistic values and computes the p-value, which is then returned. 
+  The function titled Hypothesis_Test within this package computes and returns the p-value after bootstrapping. The model is fit using the run_model function and a t-value for $\hat{\beta_1}$, the coefficient estimate for the seroprevalence paramter, is obtained. The function then generates bootrapped samples for the random effects, and computes the value of $\eta_{ij}$ as seen above, allowing for the value of $\mu_{ij}$ to be obtained as well. The values of $Y_{ij}$ are then computed and the model is refit. The function then finds the bootstrapped test statistic values and computes the p-value, which is then returned. 
   
   Below, we implement the Hypothesis_Test function using the tortoise data.
   
 ```{r}
 
 p_value <- Hypothesis_Test(tortoise_clean)
+p_value
 
 ```
-
 
   The p-value computed is 0. A p-value won't be exactly 0 since it is the area under the t-distribution curve, so we can assume that the p-value obtained is very small. This makes sense since in the original fit of the model, the t-statistic obtained for the parameter estimate for the prevalence is close to 5, which is very large. Since we have a small p-value, we can reject the null hypothesis and say that the seroprevalence of upper respiratory tract infections in Gopher Tortoises does have an effect on the number of shells found after accounting for the area of each site.
 
