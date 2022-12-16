@@ -29,11 +29,11 @@ SE_CI = function(my_data = tortoise){
 
   bootstrap <- tibble(B = 1:B) %>%
     crossing(my_data) %>%
-    mutate(z = rep(rnorm(n()/3, mean = 0, sd = sqrt(fit$sigmasq)), each = 3),
-           eta = fit$beta[[1]] + log(Area) + .fitted + z,  # eta_ij* = beta_0 + beta_1xij1 + log(xi2) + zi*
+    mutate(z = rep(rnorm(n()/3, mean = 0, sd = sqrt(fit$sigmasq)), each = 3),  # resample the random effects from N(0, sigmasq)
+           eta = fit$beta[[1]] + .fitted + log(Area) + z,  # eta_ij* = beta_0 + beta_1xij1 + log(xi2) + zi*
            shells = rpois(n(), lambda = exp(eta))) %>%  # Yij*~Poisson(lambda) where lambda = mu_ij* = exp(eta_ij*)
     nest_by(B) %>%
-    summarize(values = suppressMessages(run_model(data = data)), .groups = "drop")
+    summarize(values = suppressMessages(run_model(data = data)), .groups = "drop")  # refit
 
   # extract bootstrapped estimates
   Intercept <- bootstrap %>%
