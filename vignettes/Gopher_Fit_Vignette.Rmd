@@ -66,22 +66,14 @@ $$
 $$
 
 
+This package consists of three functions - run_model, SE_CI, and Hypothesis_Test. The function run_model will fit the Poisson GLMM and return an output of a list of summary statistics that include the estimates for the $\beta$ coefficients, the value of $\sigma^2$, the estimates for the random effects, the test statistics for each of the parameters, whether or not the model converged or not and various warning messages. The SE_CI function uses bootstrapping to compute estimates for the standard error and confidence intervals for the $\beta$ coefficients and $\sigma^2$. The Hypothesis_Test function uses bootstrapping to test the hypothesis that there is no significant effect of the predictors of interest on the response. 
 
 
-Within this package, the
+## Example
 
-
-
-
-
-
-
-
-
+To illustrate the use of the functions in this package, we will analyze sample data that comes from a study of upper respiratory tract infections on the survival of wild gopher tortoises. Using the functions in this package, we will fit a Poisson GLMM to the Gopher Tortoise data set, and describe the relationship between increasing seroprevalance of upper respiratory tract infections in Gopher Tortoises on the number of shells found (i.e., the number of dead tortoises) after accounting for the area of each site. Before doing that it is important to analyze the data ourselves.   
 
 ## Exploratory Data Analysis
-
-The main goal of this package is to fit a Poisson GLMM to the Gopher Tortoise data set, and describe the relationship between increasing seroprevalance of upper respiratory tract infections in Gopher Tortoises on the number of shells found (i.e., the number of dead tortoises) after accounting for the area of each site. Before doing that it is important to analyze the data ourselves.   
 
 The data set has 7 variables; Site, Year, Shells, Type, Area, Density, and Prev. The first row of the data is shown here:
 
