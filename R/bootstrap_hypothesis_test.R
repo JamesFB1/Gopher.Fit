@@ -42,7 +42,7 @@ Hypothesis_Test <- function(my_data, example, fitted_values, m, response){
     crossing(my_data) %>%
     mutate(z = rep(rnorm(n()/m, mean = 0, sd = sqrt(fit$sigmasq)), each = m), # simulate the random effects from N(0, sigmasq)
            eta_new = eta_old + z,  # eta_ij* = beta_0 + log(xi2) + zi* (no beta_1 this time)
-           response = rpois(n(), lambda = exp(eta)))  # Yij*~Poisson(lambda) where lambda = mu_ij* = exp(eta_ij*)
+           response = rpois(n(), lambda = exp(eta_new)))  # Yij*~Poisson(lambda) where lambda = mu_ij* = exp(eta_ij*)
 
   # delete original response column
   bootstrap = select(bootstrap, -colnames(bootstrap)[which(names(bootstrap) == response)])
