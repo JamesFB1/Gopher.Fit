@@ -12,21 +12,22 @@
 #' # Compute p-value
 #' Hypothesis_Test(my_data = tortoise)
 #'
-Hypothesis_Test <- function(my_data, example, m){
+Hypothesis_Test <- function(my_data, example, fitted_values, m){
 
-  # fit the model
+  # Fit the model
   fit = run_model(my_data, example)
 
-  # extract test statistic for prevalence
-  t_value <- fit$test_stat[[2]]
+  # Add fitted values to original data
+  my_data <- my_data %>%
+    mutate(eta_old = fitted_values)
 
-  # generate bootstrap samples under null hypothesis
+  # Generate bootstrap samples under null hypothesis
   B = 1050  # generate 1050 bootstrap samples - model may not converge
 
   bootstrap <- tibble(B = 1:B) %>%
     crossing(my_data) %>%
     mutate(z = rep(rnorm(n()/3, mean = 0, sd = sqrt(fit$sigmasq)), each = m), # resample the random effects from N(0, sigmasq)
-           eta = fit$beta[[1]] + log(Area) + z,  # eta_ij* = beta_0 + log(xi2) + zi* (no beta_1 this time)
+           eta_new = eta_old + z,  # eta_ij* = beta_0 + log(xi2) + zi* (no beta_1 this time)
            shells = rpois(n(), lambda = exp(eta))) %>%  # Yij*~Poisson(lambda) where lambda = mu_ij* = exp(eta_ij*)
     nest_by(B) %>%
     summarize(values = suppressMessages(run_model(data = data)), .groups = "drop")  # refit
