@@ -22,10 +22,17 @@ load("~/Gopher.Fit/data/tortoise.rda")
 ```
 
 
-## Gopher.Fit
-This is an R package that can be used to fit the Poisson GLMM. It implements bootstrapping to compute standard errors and confidence intervals, as well as hypothesis testing.
+# Gopher.Fit
+Gopher.Fit is an R package that can be used to fit the Poisson Generalized Linear Mixed Effects Model. It implements bootstrapping to compute standard errors and confidence intervals, as well as hypothesis testing.
 
 ## Introduction to the Poisson GLMM
+
+Like any model within the framework of GLMM
+
+The Poisson distribution arises naturally in several ways:
+* For small success probabilities and large number of trials, Poisson is a good approximation for Binomial. 
+* It arises in the case when the probability of an occurrence of an event in a given time interval is proportional to the length of the interval and independent of the occurence of other events. In this case, the number of events in any unspecified interval is Poisson distributed. 
+* Finally, it may arise naturally when the time between events is independent and exponentially distributed, and we count the number of events in a given period of time. 
 
 
 
