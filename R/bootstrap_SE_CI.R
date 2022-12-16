@@ -28,7 +28,7 @@ SE_CI = function(my_data, example, m){
 
   bootstrap <- tibble(B = 1:B) %>%
     crossing(my_data) %>%
-    mutate(z = rep(rnorm(n()/3, mean = 0, sd = sqrt(fit$sigmasq)), each = m),  # resample the random effects from N(0, sigmasq)
+    mutate(z = rep(rnorm(n()/m, mean = 0, sd = sqrt(fit$sigmasq)), each = m),  # resample the random effects from N(0, sigmasq)
            eta = fit$beta[[1]] + .fitted + log(Area) + z,  # eta_ij* = beta_0 + beta_1xij1 + log(xi2) + zi*
            shells = rpois(n(), lambda = exp(eta))) %>%  # Yij*~Poisson(lambda) where lambda = mu_ij* = exp(eta_ij*)
     nest_by(B) %>%
@@ -46,42 +46,24 @@ SE_CI = function(my_data, example, m){
     rows_delete(Convergence) %>%
     slice(1:6000)  # to take the first 1000 bootstraps
 
-  # extract bootstrapped estimates
-  Intercept <- bootstrap %>%
+  beta = bootstrap %>%
     select(values) %>%
-    filter(row_number() %% 6 == 1) %>%  # run_model has a list of 6 outputs, 1 to take the beta values
-    unnest(cols = values) %>%
-    filter(row_number() %% 4 == 1)  # 1 to take the estimate for the Intercept
+    filter(row_number() %% 6 == 1) %>%
+    unnest_wider(values)
 
-  Prev <- bootstrap %>%
-    select(values) %>%
-    filter(row_number() %% 6 == 1) %>%  # run_model has a list of 6 outputs, 1 to take the beta values
-    unnest(cols = values) %>%
-    filter(row_number() %% 4 == 2)  # 2 to take the estimate for prev
-
-  Sigmasq <- bootstrap %>%
+  sigmasq <- bootstrap %>%
     select(values) %>%
     filter(row_number() %% 6 == 2) %>%  # run_model has a list of 6 outputs, 2 to take the sigmasq value
-    unnest(cols = values)
+    unnest(values)
 
-  # compute standard errors and confidence intervals
-  Intercept <- Intercept %>%
-    summarize(SE = sd(values),
-              Lower95 = quantile(values, 0.025),
-              Upper95 = quantile(values, 0.975))
+  colnames(sigmasq)[1] = "sigmasq"
 
-  Prev <- Prev %>%
-    summarize(SE = sd(values),
-              Lower95 = quantile(values, 0.025),
-              Upper95 = quantile(values, 0.975))
+  total = beta %>%
+    mutate(sigmasq)
 
-  Sigmasq <- Sigmasq %>%
-    summarize(SE = sd(values),
-              Lower95 = quantile(values, 0.025),
-              Upper95 = quantile(values, 0.975))
+  tibble(Variable = colnames(total),
+       SE = apply(total, 2, sd),
+       Lower95 = apply(total, 2, quantile, prob = 0.025),
+       Upper95 = apply(total, 2, quantile, prob = 0.975))
 
-  # return values
-  return(list(Intercept = Intercept,
-              Prev = Prev,
-              Sigmasq = Sigmasq))
 }
