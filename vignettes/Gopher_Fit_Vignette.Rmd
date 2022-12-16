@@ -91,3 +91,29 @@ shells_by_site = tortoise %>%
 shells_by_site %>%
   knitr::kable()
 ```
+
+## Data Processing
+  Before fitting the model, we clean up the dataset by adding an ID column and removing the type and density columns as we are not interested in these variables.
+  
+```{r}
+tortoise_clean <- tortoise %>%
+    rowid_to_column("ID") %>%  # add ID column
+    select(-type, -density)    # delete type and density columns
+```
+
+
+
+## Bootstrap
+  After fitting the model using the run_model function, we will now use the function SE_CI from this package to find the standard errors and confidence intervals. This function implements a parametric bootstrap by simulating the random effects from $N(0, \sigma^2)$, since the random effects are assumed to be independent and identically distributed normal random variables with mean 0 and variance $\sigma^2$ $(Z_i \stackrel{iid}{\sim} N(0, \sigma^2)$.
+  
+  Below, we implement function using the gopher tortoises data. The function returns a list of 3 tibbles. The tibbles contain the standard error, and upper and lower confidence interval estimates for $\beta_0$, $\beta_1$, and $\sigma^2$. 
+  
+```{r}
+# Estimating Standard Errors and Confidence Intervals
+SE_CI(tortoise_clean)
+
+```
+
+  Within the function, the first step that is completed is the the model is fit using the run_model function. 
+
+
