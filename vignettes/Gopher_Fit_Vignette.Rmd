@@ -29,14 +29,19 @@ Gopher.Fit is an R package that can be used to fit the Poisson Generalized Linea
 
 Like any model within the framework of GLMM, the Poisson GLMM has 3 components to make note of. 
 1. The distribution of the response variable belongs to the exponential family. 
-2. The mean is 
+2. The mean is an invertible function of the linear predictor. This function is called the log link function. 
+3. The linear predictor is a linear combination of fixed effects and random effects. 
 
 The Poisson distribution arises naturally in several ways:
 * For small success probabilities and large number of trials, Poisson is a good approximation for Binomial. 
 * It arises in the case when the probability of an occurrence of an event in a given time interval is proportional to the length of the interval and independent of the occurence of other events. In this case, the number of events in any unspecified interval is Poisson distributed. 
 * Finally, it may arise naturally when the time between events is independent and exponentially distributed, and we count the number of events in a given period of time. 
 
+The Poisson Model is defined such that
 
+$$
+\left. Y_i  \right\vert \mu_i \sim \text{Poisson}(\mu_i), \text{ } i = 1, ..., n; j = 1, ..., m
+$$
 
 
 ## Exploratory Data Analysis
@@ -126,6 +131,13 @@ The run_model function in this package is used to fit the tortoise data to a poi
 ```{r}
 # Fit model to gopher tortoises data
 tortoise_fit <- run_model(data = tortoise, example = "tortoise")
+
+# Obtain the fitted values
+x1 <- tortoise$prev
+x2 <- tortoise$Area
+
+fitted_values <- tortoise_fit$beta[[1]] + tortoise_fit$beta[[2]] * x1 + log(x2)
+
 ```
 
 

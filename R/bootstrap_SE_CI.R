@@ -14,14 +14,14 @@
 #'
 #' # compute SE and CI
 #' SE_CI(tortoise)
-SE_CI = function(my_data, example, m){
+SE_CI = function(my_data, example, fitted_values, m){
 
   # Fit the model
   fit <- run_model(my_data, example)
 
   # Add fitted values to original data
   my_data <- my_data %>%
-    mutate(.fitted = fit$beta[[2]] * prev)
+    mutate(eta_old = fitted_values)
 
   # generate bootstrap samples
   B = 1050  # generate 1050 bootstrap samples since model may not converge
@@ -29,7 +29,7 @@ SE_CI = function(my_data, example, m){
   bootstrap <- tibble(B = 1:B) %>%
     crossing(my_data) %>%
     mutate(z = rep(rnorm(n()/m, mean = 0, sd = sqrt(fit$sigmasq)), each = m),  # resample the random effects from N(0, sigmasq)
-           eta = fit$beta[[1]] + .fitted + log(Area) + z,  # eta_ij* = beta_0 + beta_1xij1 + log(xi2) + zi*
+           eta_new = eta_old + z,  # eta_ij* = beta_0 + beta_1xij1 + log(xi2) + zi*
            shells = rpois(n(), lambda = exp(eta))) %>%  # Yij*~Poisson(lambda) where lambda = mu_ij* = exp(eta_ij*)
     nest_by(B) %>%
     summarize(values = suppressWarnings(suppressMessages(run_model(data = data))), .groups = "drop")
