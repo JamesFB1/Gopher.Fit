@@ -140,7 +140,7 @@ Below, we implement function using the gopher tortoises data. The function retur
 
 ```{r, warning=FALSE, message=FALSE}
 # Estimating Standard Errors and Confidence Intervals
-se_ci_estimates <- SE_CI(tortoise_clean)
+se_ci_estimates <- SE_CI(tortoise)
 
 ```
 
@@ -172,7 +172,7 @@ Below, we implement the Hypothesis_Test function using the tortoise data.
 
 ```{r}
 
-p_value <- Hypothesis_Test(tortoise_clean)
+p_value <- Hypothesis_Test(tortoise)
 p_value
 
 ```
@@ -180,7 +180,7 @@ p_value
 The p-value computed is 0. A p-value won't be exactly 0 since it is the area under the t-distribution curve, so we can assume that the p-value obtained is very small. This makes sense since in the original fit of the model, the t-statistic obtained for the parameter estimate for the prevalence is close to 5, which is very large. Since we have a small p-value, we can reject the null hypothesis and say that the seroprevalence of upper respiratory tract infections in Gopher Tortoises does have an effect on the number of shells found after accounting for the area of each site.
 
 ```{r, echo = FALSE, message=FALSE, warning = FALSE}
-my_data = tortoise_clean
+my_data = tortoise
 fit = run_model(my_data, example = "tortoise")
 
   # extract test statistic for prevalence
