@@ -28,7 +28,7 @@ SE_CI = function(my_data, example, m){
 
   bootstrap <- tibble(B = 1:B) %>%
     crossing(my_data) %>%
-    mutate(z = rep(rnorm(n()/m, mean = 0, sd = sqrt(fit$sigmasq)), each = m),  # resample the random effects from N(0, sigmasq)
+    mutate(z = rep(rnorm(n()/m, mean = 0, sd = sqrt(fit$sigmasq)), each = m),  # simulate the random effects from N(0, sigmasq)
            eta = fit$beta[[1]] + .fitted + log(Area) + z,  # eta_ij* = beta_0 + beta_1xij1 + log(xi2) + zi*
            shells = rpois(n(), lambda = exp(eta))) %>%  # Yij*~Poisson(lambda) where lambda = mu_ij* = exp(eta_ij*)
     nest_by(B) %>%

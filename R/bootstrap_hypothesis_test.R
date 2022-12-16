@@ -1,6 +1,9 @@
 #' Final Project Hypothesis Test
 #'
 #' @param my_data the data set you're using
+#' @param example the name of your example: will be one of either "culcita", "ctsib", "epilepsy", or "tortoise"
+#' @param m either the number of repeated observations from n individuals (repeated measures study)
+#' or the number of subjects within n groups (grouped effects data)
 #'
 #' @return the p-value obtained after testing then null hypothesis
 #' @export
@@ -25,7 +28,7 @@ Hypothesis_Test <- function(my_data, example, m){
 
   bootstrap <- tibble(B = 1:B) %>%
     crossing(my_data) %>%
-    mutate(z = rep(rnorm(n()/3, mean = 0, sd = sqrt(fit$sigmasq)), each = m), # resample the random effects from N(0, sigmasq)
+    mutate(z = rep(rnorm(n()/m, mean = 0, sd = sqrt(fit$sigmasq)), each = m), # simulate the random effects from N(0, sigmasq)
            eta = fit$beta[[1]] + log(Area) + z,  # eta_ij* = beta_0 + log(xi2) + zi* (no beta_1 this time)
            shells = rpois(n(), lambda = exp(eta))) %>%  # Yij*~Poisson(lambda) where lambda = mu_ij* = exp(eta_ij*)
     nest_by(B) %>%
@@ -50,7 +53,7 @@ Hypothesis_Test <- function(my_data, example, m){
     select(values) %>%
     filter(row_number() %% 6 == 4) %>%  # run_model has a list of 6 outputs, 0 to take the test statistics
     unnest(cols = values) %>%
-    filter(row_number() %% 4 == 2)  # 2 to take the test-stat for prev
+    filter(row_number() %% 4 == 2)  # 2 to take the test-stat for beta_1
 
   # compute p-value
   p_value <- p_value %>%
