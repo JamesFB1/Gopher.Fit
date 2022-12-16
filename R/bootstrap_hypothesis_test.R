@@ -31,12 +31,23 @@ Hypothesis_Test <- function(my_data = tortoise){
     nest_by(B) %>%
     summarize(values = suppressMessages(run_model(data = data)), .groups = "drop")  # refit
 
+  # check convergence
+  Convergence = bootstrap %>%
+    filter(row_number() %% 6 == 5) %>%
+    unnest(cols = values) %>%
+    filter(values == -1) %>%
+    select(B)
+
+  # delete rows with unconverged estimates
+  bootstrap = bootstrap %>%
+    rows_delete(Convergence)
+
   # Compute p-value
 
   # first extract bootstrapped test statistics
   p_value <- bootstrap %>%
     select(values) %>%
-    filter(row_number() %% 4 == 0) %>%  # run_model has a list of 4 outputs, 0 to take the test statistics
+    filter(row_number() %% 6 == 4) %>%  # run_model has a list of 4 outputs, 0 to take the test statistics
     unnest(cols = values) %>%
     filter(row_number() %% 4 == 2)  # 2 to take the test-stat for prev
 
