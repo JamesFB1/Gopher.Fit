@@ -32,7 +32,7 @@ SE_CI = function(my_data, example, m){
            eta = fit$beta[[1]] + .fitted + log(Area) + z,  # eta_ij* = beta_0 + beta_1xij1 + log(xi2) + zi*
            shells = rpois(n(), lambda = exp(eta))) %>%  # Yij*~Poisson(lambda) where lambda = mu_ij* = exp(eta_ij*)
     nest_by(B) %>%
-    summarize(values = suppressMessages(run_model(data = data)), .groups = "drop")
+    summarize(values = suppressWarnings(suppressMessages(run_model(data = data))), .groups = "drop")
 
   # check convergence
   Convergence <- bootstrap %>%
@@ -46,21 +46,26 @@ SE_CI = function(my_data, example, m){
     rows_delete(Convergence) %>%
     slice(1:6000)  # to take the first 1000 bootstraps
 
+  # extract bootstrapped betas
   beta = bootstrap %>%
     select(values) %>%
     filter(row_number() %% 6 == 1) %>%
     unnest_wider(values)
 
+  # extract bootstrapped sigmasquared
   sigmasq <- bootstrap %>%
     select(values) %>%
     filter(row_number() %% 6 == 2) %>%  # run_model has a list of 6 outputs, 2 to take the sigmasq value
     unnest(values)
 
+  # rename column
   colnames(sigmasq)[1] = "sigmasq"
 
+  # combine data
   total = beta %>%
     mutate(sigmasq)
 
+  # compute and return SE's and CI's
   tibble(Variable = colnames(total),
        SE = apply(total, 2, sd),
        Lower95 = apply(total, 2, quantile, prob = 0.025),
