@@ -239,12 +239,13 @@ $$
 
 The function Hypothesis_Test within this package computes and returns the p-value after bootstrapping. The model is fit using the run_model function and a t-value for $\hat{\beta_1}$, the coefficient estimate for the seroprevalence parameter, is obtained. The function then generates bootstrapped samples for the random effects, and computes the value of $\eta_{ij}$ as seen above, allowing for the value of $\mu_{ij}$ to be obtained as well. The values of $Y_{ij}$ are then computed and the model is refit. The function then finds the bootstrapped test statistic values and computes the p-value, which is then returned.
 
-Below, we implement the Hypothesis_Test function using the tortoise data. The arguments this function requires are similar to those of the SE_CI function used earlier.
+Below, we implement the Hypothesis_Test function using the tortoise data. The arguments this function requires are similar to those of the SE_CI function used earlier. However, this function requires an extra parameter called beta_1 that is the name of the parameter of interest for which we wish to test the null hypothesis for. 
 
 ```{r}
 
 p_value <- Hypothesis_Test(my_data = tortoise, example = "tortoise", 
-                           fitted_values = fitted_values, m = 3, response = "shells")
+                           fitted_values = fitted_values_hyp, m = 3, 
+                           response = "shells", beta_1 = "prev")
 p_value
 
 ```
