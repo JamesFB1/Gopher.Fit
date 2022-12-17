@@ -237,14 +237,14 @@ $$
 \eta_{ij} = \beta_0 + log(x_{i2}) + z_i
 $$
 
-The function Hypothesis_Test within this package computes and returns the p-value after bootstrapping. The model is fit using the run_model function and a t-value for $\hat{\beta_1}$, the coefficient estimate for the seroprevalence parameter, is obtained. The function then generates bootstrapped samples for the random effects, and computes the value of $\eta_{ij}$ as seen above, allowing for the value of $\mu_{ij}$ to be obtained as well. The values of $Y_{ij}$ are then computed and the model is refit. The function then finds the bootstrapped test statistic values and computes the p-value, which is then returned.
+The function Hypothesis_Test within this package computes and returns the p-value after bootstrapping. The model is fit using the run_model function and a t-value for $\hat{\beta_1}$, the coefficient estimate for the seroprevalence parameter, is obtained. Before generating bootstrapped samples for the random effects, the function ensures the fitted_values input do not include the $\hat{\beta_1}$ term. The function removes it from the fitted values (in our example, the fitted values become $\eta_{ij} = \beta_0 + log(x_{i2})$, keeping in mind that the random effects are not included here). Then, bootstrapped samples are generated for the random effects, and the value of $\eta_{ij}$ is computed as seen above, allowing for the value of $\mu_{ij}$ to be obtained as well. The values of $Y_{ij}$ are then computed and the model is refit. The function then finds the bootstrapped test statistic values and computes the p-value, which is returned.
 
-Below, we implement the Hypothesis_Test function using the tortoise data. The arguments this function requires are similar to those of the SE_CI function used earlier. However, this function requires an extra parameter called beta_1 that is the name of the parameter of interest for which we wish to test the null hypothesis for. 
+Below, we implement the Hypothesis_Test function using the tortoise data. The arguments this function requires are similar to those of the SE_CI function used earlier. However, this function requires an extra parameter called beta_1 that is the name of the parameter of interest for which we wish to test the null hypothesis for. In our example, we add "prev" as the required argument for this parameter. The fitted values we pass to this function are the same as what we found above. 
 
 ```{r}
 
 p_value <- Hypothesis_Test(my_data = tortoise, example = "tortoise", 
-                           fitted_values = fitted_values_hyp, m = 3, 
+                           fitted_values = fitted_values, m = 3, 
                            response = "shells", beta_1 = "prev")
 p_value
 
