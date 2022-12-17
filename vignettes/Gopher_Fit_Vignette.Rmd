@@ -299,7 +299,7 @@ my_plot
 ```
 
 ## Summary
-The final function fit_summary combines the two previous function and gives an output like this:
+The final function fit_summary combines the two previous function and gives an output of a list including a tibble with the estimates, standard errors, and confidence intervals, as well as a p value for the parameter of your choosing. The proper way to format the parameter and output look like this :
 ```{r, echo = FALSE}
 fit_summary(my_data = tortoise, example = "tortoise", 
                            fitted_values = fitted_values, m = 3, 
