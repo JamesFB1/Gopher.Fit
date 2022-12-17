@@ -7,7 +7,7 @@
 #' or the number of subjects within n groups (grouped effects data)
 #' @param response the response variable of your data set in ""
 #'
-#' @return a list of the SE and CI of each estimate
+#' @return a tibble of the SE and CI of each estimate
 #' @export
 #'
 #' @examples
