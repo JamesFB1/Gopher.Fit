@@ -6,7 +6,7 @@
 #' @param m either the number of repeated observations from n individuals (repeated measures study)
 #' or the number of subjects within n groups (grouped effects data)
 #' @param response the response variable of your data set in ""
-#' @param beta_1 the parameter of interest for which we wish to test the null hypothesis for
+#' @param beta_i the parameter of interest for which we wish to test the null hypothesis for, default value of 0 for the intercept
 #'
 #'
 #' @return the p-value obtained after testing then null hypothesis
@@ -26,18 +26,22 @@
 #' fitted_values <- tortoise_fit$beta[[1]] + tortoise_fit$beta[[2]] * x1 + log(x2) #fitted values without random effects
 #'
 #' # Compute p-value
-#' Hypothesis_Test(tortoise, "tortoise, fitted_values, 3, "shells", "prev")
+#' Hypothesis_Test(tortoise, "tortoise", fitted_values, 3, "shells", "prev")
 
-Hypothesis_Test <- function(my_data, example, fitted_values, m, response, beta_1){
+Hypothesis_Test <- function(my_data, example, fitted_values, m, response, beta_i = 0){
 
   # Fit the model
   fit = run_model(my_data, example)
 
   # Get t-value for parameter of interest (beta_1)
-  t_value <- fit$test_stat[[beta_1]]
+  t_value <- fit$test_stat[[beta_i]]
 
-  # Remove beta_1 * predictor term from fitted_values
-  fitted_values <- fitted_values - fit$beta[[beta_1]] * as.vector(select(my_data, beta_1))[[1]]
+  if(beta_i == 0)
+    fitted_values = fitted_values - fit$beta[[1]]
+
+  else
+   # Remove beta_1 * predictor term from fitted_values
+    fitted_values <- fitted_values - fit$beta[[beta_i]] * as.vector(select(my_data, beta_i))[[1]]
 
   # Add fitted values to original data
   my_data <- my_data %>%
@@ -81,12 +85,11 @@ Hypothesis_Test <- function(my_data, example, fitted_values, m, response, beta_1
   p_value <- bootstrap %>%
     select(values) %>%
     filter(row_number() %% 6 == 4) %>%  # run_model has a list of 6 outputs, 0 to take the test statistics
-    unnest(cols = values) %>%
-    filter(row_number() %% 4 == 2)  # 2 to take the test-stat for prev
+    unnest_wider(values)
 
   # compute p-value
   p_value <- p_value %>%
-    summarize(p = mean(abs(values) > abs(t_value)))
+    summarize(p = mean(abs(p_value[beta_i]) > abs(t_value)))
 
   # Return the p-value
   return(p_value$p)
