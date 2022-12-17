@@ -17,7 +17,6 @@ knitr::opts_chunk$set(
 ```{r setup, echo = FALSE, message=FALSE}
 library(Gopher.Fit)
 library(tidyverse)
-library(patchwork)
 load("~/Gopher.Fit/data/tortoise.rda")
 ```
 
@@ -298,3 +297,10 @@ my_plot = ggplot(data = p_value, aes( x = values)) +
 
 my_plot
 ```
+
+## Summary
+The final function fit_summary combines the two previous function and gives an output like this:
+```{r, echo = FALSE}
+fit_summary(my_data = tortoise, example = "tortoise", 
+                           fitted_values = fitted_values, m = 3, 
+                           response = "shells", beta_1 = "prev")
