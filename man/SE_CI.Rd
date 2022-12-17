@@ -4,13 +4,22 @@
 \alias{SE_CI}
 \title{Final Project SE and CI}
 \usage{
-SE_CI(my_data = tortoise)
+SE_CI(my_data, example, fitted_values, m, response)
 }
 \arguments{
 \item{my_data}{the data set you're using}
+
+\item{example}{the name of your example: will be one of either "culcita", "ctsib", "epilepsy", or "tortoise"}
+
+\item{fitted_values}{fitted values of your linear predictor without random effects}
+
+\item{m}{either the number of repeated observations from n individuals (repeated measures study)
+or the number of subjects within n groups (grouped effects data)}
+
+\item{response}{the response variable of your data set in ""}
 }
 \value{
-a list of the SE and CI of each estimate
+a tibble of the SE and CI of each estimate
 }
 \description{
 Final Project SE and CI
@@ -19,6 +28,16 @@ Final Project SE and CI
 # load tortoise data
 load("~/Gopher.Fit/data/tortoise.rda")
 
+#Fit model to gopher tortoises data
+tortoise_fit <- run_model(data = tortoise, example = "tortoise")
+
+# Obtain the fitted values
+x1 <- tortoise$prev
+x2 <- tortoise$Area
+
+fitted_values <- tortoise_fit$beta[[1]] + tortoise_fit$beta[[2]] * x1 + log(x2) #fitted values without random effects
+
+
 # compute SE and CI
-SE_CI(tortoise)
+SE_CI(tortoise, "tortoise", fitted_values, 3, "shells")
 }

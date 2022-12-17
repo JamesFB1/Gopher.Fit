@@ -25,7 +25,7 @@
 #'
 #'
 #' # compute SE and CI
-#' SE_CI(tortoise, "tortoise", fitted_values, 3, "shells)
+#' SE_CI(tortoise, "tortoise", fitted_values, 3, "shells")
 
 SE_CI = function(my_data, example, fitted_values, m, response){
 

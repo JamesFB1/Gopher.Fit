@@ -2,6 +2,7 @@
 
 export(Hypothesis_Test)
 export(SE_CI)
+export(fit_summary)
 export(run_model)
 importFrom(dplyr,"%>%")
 importFrom(dplyr,filter)
