@@ -36,6 +36,9 @@ Hypothesis_Test <- function(my_data, example, fitted_values, m, response, beta_1
   # Get t-value for parameter of interest (beta_1)
   t_value <- fit$test_stat[[beta_1]]
 
+  # Remove beta_1 * predictor term from fitted_values
+  fitted_values <- fitted_values - fit$beta[[beta_1]] * as.vector(select(my_data, beta_1))[[1]]
+
   # Add fitted values to original data
   my_data <- my_data %>%
     mutate(eta_old = fitted_values)
