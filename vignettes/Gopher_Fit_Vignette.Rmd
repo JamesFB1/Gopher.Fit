@@ -151,7 +151,7 @@ tortoise <- tortoise %>%
 ```
 
 
-## Fit Model
+## Fitting the Poisson Model
 
 The run_model function in this package is used to fit the tortoise data to a poisson glmm. The first parameter needed for this function is the data, and the second paramter is the name of the dataset used. The function also takes the fitted values, $\hat{\eta_{ij}}$ obtained from running the model (these values don't include the random effects). After sampling the random effects within the bootstrap function, we are able to set $\eta_{ij}^* = \beta_0 + \beta_1x_{ij1} + log(x_{i2}) + z_i^*$ and refit the model to obtain bootstrapped estimates of $\beta_0$ and $\beta_1$. This is discussed in more detail below. 
 
@@ -198,6 +198,8 @@ The output of the run_model function provides summary statistics about our Poiss
 
 ## Bootstrap
 
+### Estimating Standard Errors and Confidence Intervals
+
 After fitting the model using the run_model function, we will now use the function SE_CI from this package to find the standard errors and confidence intervals. This function implements a parametric bootstrap by simulating the random effects from $N(0, \sigma^2)$, since the random effects are assumed to be independent and identically distributed normal random variables with mean 0 and variance $\sigma^2$ $(Z_i \stackrel{iid}{\sim} N(0, \sigma^2)$.
 
 Below, we implement the SE_CI function using the gopher tortoises data. The function returns a list of 3 tibbles. The tibbles contain the standard error, and upper and lower confidence interval estimates for $\beta_0$, $\beta_1$, and $\sigma^2$.
@@ -229,6 +231,15 @@ se_ci_estimates %>%
 We are interested in the standard errors and confidence intervals for the estimates of $\hat{\beta_0}$ and $\hat{\beta_1}$ as well as for the variance $\hat{\sigma^2}$. We care about the standard error because if the standard error is large, the estimate is likely to be far from the true value, but if the standard error is small, the estimate will be close to the true value. 
 
 From the table above, we can see that the standard errors are all relatively small values. For prevalence especially, the standard error is very small, meaning the estimate $\hat{\beta_1}$ must be close to the true value $\beta_1$. 
+
+```{r}
+tortoise_fit$beta
+tortoise_fit$sigmasq
+```
+
+As well, the estimates for each of $\hat{\beta_0}$, $\hat{\beta_1}$ and $\hat{\sigma^2}$ are within their respective confidence intervals.
+
+### Testing the Research Hypothesis
 
 We are also interested in performing a significance of regression test using the t-test. Bootstrapping may also be implemented to carry out this test. For our example, we wish to test the null hypothesis that there is no effect of prevalence on the number of shells found at each site:
 
@@ -304,9 +315,7 @@ my_plot = ggplot(data = p_value, aes(x = values)) +
 my_plot
 ```
 
-The vertical red line is the t-value from fitting the model using the run_model function. This plot shows the test statistics for the seroprevalence predictor obtained from bootstrapping. 
-
-
+The vertical red line is the t-value from fitting the model using the run_model function. This plot shows the test statistics for the seroprevalence predictor obtained from bootstrapping.
 
 ## Summary
 The final function fit_summary combines the two previous function and gives an output of a list including a tibble with the estimates, standard errors, and confidence intervals, as well as a p value for the parameter of your choosing. The proper way to format the parameter and output look like this :
@@ -314,3 +323,7 @@ The final function fit_summary combines the two previous function and gives an o
 fit_summary(my_data = tortoise, example = "tortoise", 
                            fitted_values = fitted_values, m = 3, 
                            response = "shells", beta_i = "prev")
+```
+
+
+
