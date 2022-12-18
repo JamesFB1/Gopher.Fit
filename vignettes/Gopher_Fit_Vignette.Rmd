@@ -194,7 +194,7 @@ tortoise_fit$messages
 
 ```
 
-
+The output of the run_model function provides summary statistics about our Poisson model. We can see the estimates for the $\beta$ coefficients and the t-statistics associated with each of our predictors, as well as the estimated variance and random effects. The convergence element returned from this function tells us whether or not convergence occurred, with all elements equal to 0 indicating the algorithm has converged, which in our case, it has. Finally, the function returns any messages that are produced from fitting the model. 
 
 ## Bootstrap
 
@@ -229,7 +229,6 @@ se_ci_estimates %>%
 We are interested in the standard errors and confidence intervals for the estimates of $\hat{\beta_0}$ and $\hat{\beta_1}$ as well as for the variance $\hat{\sigma^2}$. We care about the standard error because if the standard error is large, the estimate is likely to be far from the true value, but if the standard error is small, the estimate will be close to the true value. 
 
 From the table above, we can see that the standard errors are all relatively small values. For prevalence especially, the standard error is very small, meaning the estimate $\hat{\beta_1}$ must be close to the true value $\beta_1$. 
-
 
 We are also interested in performing a significance of regression test using the t-test. Bootstrapping may also be implemented to carry out this test. For our example, we wish to test the null hypothesis that there is no effect of prevalence on the number of shells found at each site:
 
