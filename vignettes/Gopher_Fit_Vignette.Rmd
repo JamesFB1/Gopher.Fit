@@ -362,7 +362,7 @@ fit_summary(my_data = tortoise, example = "tortoise",
 
 
 ## Conclusion
-The capabilities of the R Gopher.Fit package have been described. We hope that useres have found this document helpful in implementing and using Poisson GLMM's in R. 
+The capabilities of the R Gopher.Fit package have been described. We hope that users have found this document helpful in implementing and using Poisson GLMM's in R. 
 
 ## References
 Bonner, Simon. "STATS 4864: Advanced Statistical Computing Lecture #7: Bootstrapping." Stats 4864: Advanced Statistical Computing. The University of Western Ontario. London, Ontario. 21 November 2022. Lecture. 
