@@ -67,6 +67,33 @@ Since there is no closed-form formula for $\hat{\beta}$ that can be obtained fro
 
 This package consists of three functions - run_model, SE_CI, and Hypothesis_Test. The function run_model will fit the Poisson GLMM and return an output of a list of summary statistics that include the estimates for the $\beta$ coefficients, the value of $\sigma^2$, the estimates for the random effects, the test statistics for each of the parameters, whether or not the model converged or not and associated warning messages. The SE_CI function uses bootstrapping to compute estimates for the standard error and confidence intervals for the $\beta$ coefficients and $\sigma^2$. The Hypothesis_Test function uses bootstrapping to test the hypothesis that there is no significant effect of the predictors of interest on the response. 
 
+## Getting Started
+
+To install the Gopher.Fit package from R, you can type:
+
+```{r, eval=FALSE}
+install.packages("Gopher.Fit")
+```
+
+Once the Gopher.Fit package is installed, it must be made accessible to the current R session by command, 
+
+```{r, eval=FALSE}
+library(Gopher.Fit)
+```
+
+These procedures provide access to the functions within the Gopher.Fit package. 
+
+You may check the details of a particular function by typing:
+```{r, eval=FALSE}
+help(SE_CI)
+```
+or
+```{r, eval=FALSE}
+?SE_CI
+```
+which is a convenient shorthand. 
+
+The example for the Gopher.Fit package included in this Vignette is an analysis of the data from a study of upper respiratory tract infections on the survival of wild gopher tortoises. First the model is fit using a Poisson GLMM, then the standard errors and confidence intervals are computed for estimates of the $\beta$ coefficients as well as for the variance, and finally, a significance of regression test is conducted to test the effect of the seroprevalence predictor on the number of shells found at each site after accounting for the area.
 
 ## Gopher Tortoises
 
@@ -193,6 +220,14 @@ tortoise_fit$convergence
 tortoise_fit$messages
 
 ```
+
+or type
+
+```{r, eval=FALSE}
+tortoise_fit
+```
+
+for a concise summary of the results.
 
 The output of the run_model function provides summary statistics about our Poisson model. We can see the estimates for the $\beta$ coefficients and the t-statistics associated with each of our predictors, as well as the estimated variance and random effects. The convergence element returned from this function tells us whether or not convergence occurred, with all elements equal to 0 indicating the algorithm has converged, which in our case, it has. Finally, the function returns any messages that are produced from fitting the model. 
 
@@ -326,4 +361,13 @@ fit_summary(my_data = tortoise, example = "tortoise",
 ```
 
 
+## Conclusion
+The capabilities of the R Gopher.Fit package have been described. We hope that useres have found this document helpful in implementing and using Poisson GLMM's in R. 
+
+## References
+Bonner, Simon. "STATS 4864: Advanced Statistical Computing Lecture #7: Bootstrapping." Stats 4864: Advanced Statistical Computing. The University of Western Ontario. London, Ontario. 21 November 2022. Lecture. 
+
+Bonner, Simon. "STATS 4864: Advanced Statistical Computing Final Project." Stats 4864: Advanced Statistical Computing. The University of Western Ontario. London, Ontario. 27 November 2022. Notes. 
+
+Faraway, Julian J. *Extending the Linear Model with R Generalized Linear, Mixed Effects and Nonparametric Regression Models (2nd ed.)*. Chapman & Hall/CRC, Taylor & Francis Group, 2016.
 
