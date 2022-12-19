@@ -7,6 +7,7 @@
 #' @importFrom dplyr mutate
 #' @importFrom dplyr n
 #' @importFrom dplyr nest_by
+#' @importFrom dplyr row_number
 #' @importFrom dplyr rows_delete
 #' @importFrom dplyr select
 #' @importFrom dplyr slice

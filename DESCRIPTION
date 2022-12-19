@@ -1,10 +1,10 @@
 Package: Gopher.Fit
-Title: Fit Gopher Tortoise Data
+Title: Fit Poisson GLMM
 Version: 0.0.0.9000
 Authors@R: 
     c(person("James", "Fraser Barsby", , "jfraserb@uwo.ca", role = c("aut", "cre")),
     person("Shi Yu (Dora)", "Cao", , "scao85@uwo.ca", role = c("aut")))
-Description: This package aims to fit a Poisson GLMM to a data set from a study of upper repiratory tract infections on the survival of wild gopher tortoises. The package provides functions to fit the model and provide summary information including the point estimates, standard errors, and a 95% confidence interval for each parameter.  
+Description: This package aims to fit a Poisson GLMM. The package provides functions to fit the model and provide summary information including the point estimates, standard errors, and a 95% confidence interval for each parameter.  
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -17,6 +17,7 @@ LazyData: true
 Imports: 
     dplyr,
     lme4,
+    readr,
     tibble,
     tidyr
 Suggests: 

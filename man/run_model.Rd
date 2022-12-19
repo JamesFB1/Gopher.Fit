@@ -18,44 +18,10 @@ A list with summary statistics from the fitted model.
 Final Project Model Fitting
 }
 \examples{
-##### Epilepsy #####
-
-## Load data
-epilepsy <- read_csv("epilepsy.csv")
-
-## Sum separate observations for each patient in the after period
-epilepsy <- epilepsy \%>\%
-  group_by(id,treat,expind,age) \%>\%
-  summarize(seizures = sum(seizures),
-            .groups = "drop")
-
-## Fit model to epilepsy data. Fixed effects in the model are:
-##  (Intercept) -- the intercept
-##  age -- age as a continuous predictor
-##  expind -- a categorical variable with two levels (0 for before and 1 for after)
-##  expind:treat -- a categorical variable with two levels (1 for observations from individuals on the drug in the after period and 0 otherwise)
-
-epilepsy_fit <- run_model(epilepsy, "epilepsy")
-
-##### CTSIB #####
-
-## Load data
-ctsib <- read_csv("ctsib.csv")
-
-## Define response (stable or not)
-ctsib <- ctsib \%>\%
-  mutate(stable = 1 * (CTSIB == 1))
-
-## Fit model to ctsib data. Fixed effects in the model include:
-##  (Intercept) -- the intercept
-##  Surface -- a categorical variable with two levels (foam and norm)
-##  Vision -- a categorical variable with three levels (closed, dome, open)
-
-ctsib_fit <- run_model(ctsib, "ctsib")
 
 ##### Tortoise #####
 ## Load data
-tortoise <- read_csv("gopher_tortoise.csv")
+data(tortoise)
 
 ## Fit model to tortoise data. Fixed effects in the model are:
 ##   (Intercept) -- the intercept
@@ -64,13 +30,4 @@ tortoise <- read_csv("gopher_tortoise.csv")
 
 tortoise_fit <- run_model(tortoise, "tortoise")
 
-##### Culcita #####
-## Load data
-culcita <- read_csv("culcita.csv")
-
-## Fit model to culcita data. Fixed effects in the model are:
-##   (Intercept) -- the intercept
-##   ttt -- the treatment as a categorical variable with four levels: none, crabs, shrimp, or both
-
-culcita_fit <- run_model(culcita, "culcita")
 }

@@ -4,9 +4,9 @@
 \name{Gopher.Fit-package}
 \alias{Gopher.Fit}
 \alias{Gopher.Fit-package}
-\title{Gopher.Fit: Fit Gopher Tortoise Data}
+\title{Gopher.Fit: Fit Poisson GLMM}
 \description{
-This package aims to fit a Poisson GLMM to a data set from a study of upper repiratory tract infections on the survival of wild gopher tortoises. The package provides functions to fit the model and provide summary information including the point estimates, standard errors, and a 95% confidence interval for each parameter.
+This package aims to fit a Poisson GLMM. The package provides functions to fit the model and provide summary information including the point estimates, standard errors, and a 95% confidence interval for each parameter.
 }
 \seealso{
 Useful links:

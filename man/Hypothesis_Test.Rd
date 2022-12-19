@@ -28,7 +28,7 @@ Final Project Hypothesis Test
 }
 \examples{
 # load tortoise data
-load("~/Gopher.Fit/data/tortoise.rda")
+data("tortoise")
 
 #Fit model to gopher tortoises data
 tortoise_fit <- run_model(data = tortoise, example = "tortoise")

@@ -12,7 +12,8 @@
 #' @export
 #'
 #' @examples
-#' load("~/Gopher.Fit/data/tortoise.rda")
+#' # load data set
+#' data("tortoise")
 #'
 #' #Fit model to gopher tortoises data
 #' tortoise_fit <- run_model(data = tortoise, example = "tortoise")

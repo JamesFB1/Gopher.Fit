@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 ```{r setup, echo = FALSE, message=FALSE}
 library(Gopher.Fit)
 library(tidyverse)
-load("~/Gopher.Fit/data/tortoise.rda")
+data("tortoise")
 ```
 
 
@@ -218,7 +218,7 @@ Next, we wish to generate 1000 bootstrap samples. The SE_CI function will resamp
 
 The SE_CI function returns an output of a tibble giving the standard error, lower bound of the confidence interval and upper bound of the confidence interval for all estimates. Here is the output after running the function on the Gopher Tortoises data:
 
-```{r, echo = false}
+```{r, echo = FALSE}
 
 se_ci_estimates 
 
