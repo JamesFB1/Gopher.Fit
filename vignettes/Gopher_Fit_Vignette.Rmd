@@ -67,6 +67,33 @@ Since there is no closed-form formula for $\hat{\beta}$ that can be obtained fro
 
 This package consists of three functions - run_model, SE_CI, and Hypothesis_Test. The function run_model will fit the Poisson GLMM and return an output of a list of summary statistics that include the estimates for the $\beta$ coefficients, the value of $\sigma^2$, the estimates for the random effects, the test statistics for each of the parameters, whether or not the model converged or not and associated warning messages. The SE_CI function uses bootstrapping to compute estimates for the standard error and confidence intervals for the $\beta$ coefficients and $\sigma^2$. The Hypothesis_Test function uses bootstrapping to test the hypothesis that there is no significant effect of the predictors of interest on the response. 
 
+## Getting Started
+
+To install the Gopher.Fit package from R, you can type:
+
+```{r, eval=FALSE}
+install.packages("Gopher.Fit")
+```
+
+Once the Gopher.Fit package is installed, it must be made accessible to the current R session by command, 
+
+```{r, eval=FALSE}
+library(Gopher.Fit)
+```
+
+These procedures provide access to the functions within the Gopher.Fit package. 
+
+You may check the details of a particular function by typing:
+```{r, eval=FALSE}
+help(SE_CI)
+```
+or
+```{r, eval=FALSE}
+?SE_CI
+```
+which is a convenient shorthand. 
+
+The example for the Gopher.Fit package included in this Vignette is an analysis of the data from a study of upper respiratory tract infections on the survival of wild gopher tortoises. First the model is fit using a Poisson GLMM, then the standard errors and confidence intervals are computed for estimates of the $\beta$ coefficients as well as for the variance, and finally, a significance of regression test is conducted to test the effect of the seroprevalence predictor on the number of shells found at each site after accounting for the area.
 
 ## Gopher Tortoises
 
@@ -151,7 +178,7 @@ tortoise <- tortoise %>%
 ```
 
 
-## Fit Model
+## Fitting the Poisson Model
 
 The run_model function in this package is used to fit the tortoise data to a poisson glmm. The first parameter needed for this function is the data, and the second paramter is the name of the dataset used. The function also takes the fitted values, $\hat{\eta_{ij}}$ obtained from running the model (these values don't include the random effects). After sampling the random effects within the bootstrap function, we are able to set $\eta_{ij}^* = \beta_0 + \beta_1x_{ij1} + log(x_{i2}) + z_i^*$ and refit the model to obtain bootstrapped estimates of $\beta_0$ and $\beta_1$. This is discussed in more detail below. 
 
@@ -194,9 +221,19 @@ tortoise_fit$messages
 
 ```
 
+or type
 
+```{r, eval=FALSE}
+tortoise_fit
+```
+
+for a concise summary of the results.
+
+The output of the run_model function provides summary statistics about our Poisson model. We can see the estimates for the $\beta$ coefficients and the t-statistics associated with each of our predictors, as well as the estimated variance and random effects. The convergence element returned from this function tells us whether or not convergence occurred, with all elements equal to 0 indicating the algorithm has converged, which in our case, it has. Finally, the function returns any messages that are produced from fitting the model. 
 
 ## Bootstrap
+
+### Estimating Standard Errors and Confidence Intervals
 
 After fitting the model using the run_model function, we will now use the function SE_CI from this package to find the standard errors and confidence intervals. This function implements a parametric bootstrap by simulating the random effects from $N(0, \sigma^2)$, since the random effects are assumed to be independent and identically distributed normal random variables with mean 0 and variance $\sigma^2$ $(Z_i \stackrel{iid}{\sim} N(0, \sigma^2)$.
 
@@ -214,15 +251,30 @@ Here is a brief description of what the SE_CI function is doing:
 
 Within the function, we first fit our model using the run_model function. For ease, we add the value of $\hat{\beta_1}x_{ij1}$ to the dataset.
 
-Next, we wish to generate 1000 bootstrap samples. The SE_CI function will resample the values of the 10 random effects for each of the 3 years to obtain 1000 bootstrap samples of size 30. Since we have the estimates of the fixed effects from our initial fit of the model, we can compute $\eta_{ij}^* = \beta_0 + \beta_1x_{ij1} + log(x_{i2}) + z_i^*$ for $i=1, ..., 10$ and $j = 1,2,3$. Since $\mu_{ij} = e^{\eta_{ij}}$, we can compute $\mu_{ij}^*$ and simulate new $Y_{ij}^* \sim \text{Poisson}(\mu_{ij}^*)$ for $Y_{ij}$, the number of shells found at each site. We then refit the model to obtain 1000 bootstrapped estimates of $\beta_0^*$, $\beta_1^*$, and $\sigma^2$. The function also checks the convergence each time the model is fitted in the bootstrap and removes the estimates from the bootstrap where the model did not converge. Finally, we compute the standard errors of each estimate, as well as the confidence intervals.
+Next, we wish to generate 1000 bootstrap samples. The SE_CI function will resample the values of the 10 random effects for each of the 3 years to obtain 1050 bootstrap samples of size 30. The function generates 1050 bootstrap samples because not every one will have successfully converged; later the function removes these and ensures the first 1000 successful bootstraps are kept. Since we have the estimates of the fixed effects from our initial fit of the model, we can compute $\eta_{ij}^* = \beta_0 + \beta_1x_{ij1} + log(x_{i2}) + z_i^*$ for $i=1, ..., 10$ and $j = 1,2,3$. Since $\mu_{ij} = e^{\eta_{ij}}$, we can compute $\mu_{ij}^*$ and simulate new $Y_{ij}^* \sim \text{Poisson}(\mu_{ij}^*)$ for $Y_{ij}$, the number of shells found at each site. We then refit the model to obtain 1000 bootstrapped estimates of $\beta_0^*$, $\beta_1^*$, and $\sigma^2$. The function also checks the convergence each time the model is fitted in the bootstrap and removes the estimates from the bootstrap where the model did not converge. It will then take the first 1000 bootstrapped samples where convergence was successful. Finally, we compute the standard errors of each estimate, as well as the confidence intervals.
 
 The SE_CI function returns an output of a tibble giving the standard error, lower bound of the confidence interval and upper bound of the confidence interval for all estimates. Here is the output after running the function on the Gopher Tortoises data:
 
 ```{r, echo = FALSE}
 
-se_ci_estimates 
+se_ci_estimates %>%
+  knitr::kable(col.names = c("Variable", "Standard Error", "Lower CI", "Upper CI"),
+               digits = 3)
 
 ```
+
+We are interested in the standard errors and confidence intervals for the estimates of $\hat{\beta_0}$ and $\hat{\beta_1}$ as well as for the variance $\hat{\sigma^2}$. We care about the standard error because if the standard error is large, the estimate is likely to be far from the true value, but if the standard error is small, the estimate will be close to the true value. 
+
+From the table above, we can see that the standard errors are all relatively small values. For prevalence especially, the standard error is very small, meaning the estimate $\hat{\beta_1}$ must be close to the true value $\beta_1$. 
+
+```{r}
+tortoise_fit$beta
+tortoise_fit$sigmasq
+```
+
+As well, the estimates for each of $\hat{\beta_0}$, $\hat{\beta_1}$ and $\hat{\sigma^2}$ are within their respective confidence intervals.
+
+### Testing the Research Hypothesis
 
 We are also interested in performing a significance of regression test using the t-test. Bootstrapping may also be implemented to carry out this test. For our example, we wish to test the null hypothesis that there is no effect of prevalence on the number of shells found at each site:
 
@@ -236,9 +288,9 @@ $$
 \eta_{ij} = \beta_0 + log(x_{i2}) + z_i
 $$
 
-The function Hypothesis_Test within this package computes and returns the p-value after bootstrapping. The model is fit using the run_model function and a t-value for $\hat{\beta_1}$, the coefficient estimate for the seroprevalence parameter, is obtained. Before generating bootstrapped samples for the random effects, the function ensures the fitted_values input do not include the $\hat{\beta_1}$ term. The function removes it from the fitted values (in our example, the fitted values become $\eta_{ij} = \beta_0 + log(x_{i2})$, keeping in mind that the random effects are not included here). Then, bootstrapped samples are generated for the random effects, and the value of $\eta_{ij}$ is computed as seen above, allowing for the value of $\mu_{ij}$ to be obtained as well. The values of $Y_{ij}$ are then computed and the model is refit. The function then finds the bootstrapped test statistic values and computes the p-value, which is returned.
+The function Hypothesis_Test within this package computes and returns the p-value after bootstrapping. The model is fit using the run_model function and a t-value for $\hat{\beta_1}$ is obtained. In the Gopher Tortoise example, this is the coefficient estimate for the seroprevalence parameter. Before generating bootstrapped samples for the random effects, the function ensures the fitted_values input do not include the $\hat{\beta_1}$ term. The function removes it from the fitted values (in our example, the fitted values become $\eta_{ij} = \beta_0 + log(x_{i2})$, keeping in mind that the random effects are not included here). Then, bootstrapped samples are generated for the random effects, and the value of $\eta_{ij}$ is computed as seen above, allowing for the value of $\mu_{ij}$ to be obtained as well. The values of $Y_{ij}$ are then computed and the model is refit. Like the SE_CI function, the Hypothesis_Test function checks for convergence and takes the first 1000 successful bootrapped samples. The function then finds the bootstrapped test statistic values and computes the p-value, which is returned.
 
-Below, we implement the Hypothesis_Test function using the tortoise data. The arguments this function requires are similar to those of the SE_CI function used earlier. However, this function requires an extra parameter called beta_i that is the name of the parameter of interest for which we wish to test the null hypothesis for. In our example, we add "prev" as the required argument for this parameter. The fitted values we pass to this function are the same as what we found above. 
+Below, we implement the Hypothesis_Test function using the tortoise data. The arguments this function requires are similar to those of the SE_CI function used earlier. However, this function requires an extra parameter called beta_i that is the name of the parameter of interest for which we wish to test the null hypothesis for, with a default value of 0 for the intercept. In our example, we add "prev" as the required argument for this parameter. The fitted values we pass to this function are the same as what we found above. 
 
 ```{r}
 
@@ -249,7 +301,7 @@ p_value
 
 ```
 
-The p-value computed is 0. A p-value won't be exactly 0 since it is the area under the t-distribution curve, so we can assume that the p-value obtained is very small. This makes sense since in the original fit of the model, the t-statistic obtained for the parameter estimate for the prevalence is close to 5, which is very large. Since we have a small p-value, we can reject the null hypothesis and say that the seroprevalence of upper respiratory tract infections in Gopher Tortoises does have an effect on the number of shells found after accounting for the area of each site.
+The p-value computed is 0. A p-value won't be exactly 0 since it is the area under the t-distribution curve, so we can assume that the p-value obtained is very small. This makes sense since in the original fit of the model, the t-statistic obtained for the parameter estimate for the prevalence is close to 5, which is very large. Since we have a small p-value, we can reject the null hypothesis and say that the seroprevalence of upper respiratory tract infections in Gopher Tortoises does have an effect on the number of shells found in each site after accounting for the area.
 
 ```{r, echo = FALSE, message=FALSE, warning = FALSE}
 my_data = tortoise
@@ -289,7 +341,7 @@ p_value <- bootstrap %>%
     unnest(cols = values) %>%
     filter(row_number() %% 4 == 2)  # 2 to take the test-stat for prev
   
-my_plot = ggplot(data = p_value, aes( x = values)) + 
+my_plot = ggplot(data = p_value, aes(x = values)) + 
          geom_density() +
          geom_vline(xintercept = t_value, col = "red") + 
          ylab("Bootstrap Sampling Distribution (Null)") + 
@@ -298,9 +350,24 @@ my_plot = ggplot(data = p_value, aes( x = values)) +
 my_plot
 ```
 
+The vertical red line is the t-value from fitting the model using the run_model function. This plot shows the test statistics for the seroprevalence predictor obtained from bootstrapping.
+
 ## Summary
 The final function fit_summary combines the two previous function and gives an output of a list including a tibble with the estimates, standard errors, and confidence intervals, as well as a p value for the parameter of your choosing. The proper way to format the parameter and output look like this :
 ```{r, echo = FALSE}
 fit_summary(my_data = tortoise, example = "tortoise", 
                            fitted_values = fitted_values, m = 3, 
                            response = "shells", beta_i = "prev")
+```
+
+
+## Conclusion
+The capabilities of the R Gopher.Fit package have been described. We hope that users have found this document helpful in implementing and using Poisson GLMM's in R. 
+
+## References
+Bonner, Simon. "STATS 4864: Advanced Statistical Computing Lecture #7: Bootstrapping." Stats 4864: Advanced Statistical Computing. The University of Western Ontario. London, Ontario. 21 November 2022. Lecture. 
+
+Bonner, Simon. "STATS 4864: Advanced Statistical Computing Final Project." Stats 4864: Advanced Statistical Computing. The University of Western Ontario. London, Ontario. 27 November 2022. Notes. 
+
+Faraway, Julian J. *Extending the Linear Model with R Generalized Linear, Mixed Effects and Nonparametric Regression Models (2nd ed.)*. Chapman & Hall/CRC, Taylor & Francis Group, 2016.
+
